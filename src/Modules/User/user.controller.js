@@ -197,6 +197,7 @@ export const confirmEmail = async (req, res, next) => {
   check user found email or mobile number and password
   check user active email
   update status user from offline to online
+  if user found return token 
 */
 export const signIn = async (req, res, next) => {
   // destruct data from req.body
@@ -237,13 +238,9 @@ export const signIn = async (req, res, next) => {
   }
 
   // Sign a JWT token with user's ID and a secret key (make sure to use a strong secret)
-  const token = jwt.sign(
-    { userId: user._id },
-    process.env.CONFIRMATION_SECRET,
-    {
-      expiresIn: "1h",
-    }
-  ); // Token expires in 1 hour
+  const token = jwt.sign({ userId: user._id }, process.env.LOGIN_SECRET, {
+    expiresIn: "1h",
+  }); // Token expires in 1 hour
 
   // Update status from online
   const updatedUser = await User.findByIdAndUpdate(user._id, {
@@ -255,3 +252,92 @@ export const signIn = async (req, res, next) => {
 
 //---------------------------------------------------------------------------------------------
 
+
+// logout user
+/**
+ * 
+ * - user must be logged in
+ * - user data send in token in header
+ * - update the status of the user to "offline"
+ * - return "Logout Successful"
+ * 
+ */
+export const logOut = async (req, res, next) => {
+    
+    // Ensure req.userId exists
+ 
+    if (!req.authUser) {
+      return next(
+        new ErrorClass(
+          "User ID is required",
+          400,
+          "Send Token in headers",
+          "log-out API"
+        )
+      );
+    }
+      
+    // Update the  status of the user to "offline"
+    const updatedUser = await User.findByIdAndUpdate(
+      req.authUser._id,
+      {
+        status: "offline",
+      },
+      { new: true }
+    );
+    // check user found
+    if (!updatedUser) {
+      return next(
+        new ErrorClass("User not found", 404 , "logout API")
+      );
+    }
+
+    return res.status(200).json({ message: "LogOut Successful" });
+  
+};
+
+
+
+//------------------------------------------------------------------------------------------------
+/**
+ *  delete user 
+ * - only the owner of the account can delete his account data
+   - User must be loggedIn
+   user data send in token in header
+   
+ */
+
+export const deleteUser = async (req, res, next) => {
+  // Ensure req.userId exists
+  console.log(req.authUser);
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "delete user API"
+      ));
+  } 
+  // check status online 
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "delete user API"
+      )
+    );
+  }
+
+  // delete user
+  const deletedUser = await User.findByIdAndDelete(req.authUser._id);
+  // user not found
+  if (!deletedUser) {
+    return next(
+      new ErrorClass("User not found", 404, "delete user API")
+    );
+  } 
+  return res.status(200).json({ message: "User deleted successfully" });
+};

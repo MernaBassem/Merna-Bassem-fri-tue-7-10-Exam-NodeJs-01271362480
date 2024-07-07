@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { systemRoles } from "../../utils/system-roles.utils.js";
+import { generalRules } from "../../utils/general-rules.utils.js";
 
 /* user schema validation all input before the arrive to api sign_up user
   the validation only data in body
@@ -81,6 +82,10 @@ export const SignUpSchema = {
   }),
 };
 //------------------------------------------------------
+
+/* user schema validation all input before the arrive to api sign-in user
+  the validation only data in body
+*/
 export const SignInSchema = {
   body: Joi.object({
     email: Joi.string()
@@ -115,3 +120,35 @@ export const SignInSchema = {
   }).xor("email", "mobileNumber"),
 };
 //------------------------------------------------------------------
+
+/**
+ * logout schema to validate
+  - token in header
+ */
+
+export const LogoutSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+};
+//------------------------------------------------------------------------------
+
+/**
+ * delete schema to validate
+  - token in header
+ */
+
+export const DeleteSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+};
+//------------------------------------------------------------------------------

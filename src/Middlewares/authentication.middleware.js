@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 import User from "../../DB/Models/user.model.js";
-import { ErrorClass } from "../utils/error-class.utils";
+import { ErrorClass } from "../utils/error-class.utils.js";
 
 /**
  * @returns {function} return middleware function
  * @description Check if the user is authenticated or not
  */
-export const auth = () => {
+export const authenticate = () => {
   return async (req, res, next) => {
     // destruct token from headers
     const { token } = req.headers;
