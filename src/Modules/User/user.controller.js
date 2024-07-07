@@ -30,14 +30,8 @@ export const signUp = async (req, res, next) => {
   // Check if the email already exists
   const isEmailExists = await User.findOne({ email });
   if (isEmailExists) {
-
     return next(
-      new ErrorClass(
-        "Email already exists",
-        400,
-        email,
-        "sign-up api"
-      )
+      new ErrorClass("Email already exists", 400, email, "sign-up api")
     );
   }
   // check if the phone already exists
@@ -52,7 +46,6 @@ export const signUp = async (req, res, next) => {
       )
     );
   }
-
 
   // take new instance
   const userInstance = new User({
@@ -83,7 +76,6 @@ export const signUp = async (req, res, next) => {
     htmlMessage: `<a href="${confirmationLink}">Click here to confirm your email</a>`,
   });
 
-
   if (isEmailSent.rejected.length) {
     return next(
       new ErrorClass("Email Not Sent", 400, "Email Not Sent", email, "signUp ")
@@ -105,8 +97,6 @@ export const signUp = async (req, res, next) => {
  * if token expired generate new token
  */
 
-
-
 export const confirmEmail = async (req, res, next) => {
   const { token } = req.params;
 
@@ -127,9 +117,9 @@ export const confirmEmail = async (req, res, next) => {
     // check token expired
     if (err.name === "TokenExpiredError") {
       const decoded = jwt.decode(token);
-      // user data 
+      // user data
       const user = await User.findById(decoded._id);
-   
+
       if (user && !user.isConfirmed) {
         const newToken = jwt.sign(
           { _id: user._id },
@@ -148,19 +138,13 @@ export const confirmEmail = async (req, res, next) => {
             htmlMessage: `<a href="${newConfirmationLink}">Click here to confirm your email</a>`,
           });
 
-         
           // error if email not send
           if (isEmailSent.rejected.length) {
             return next(
-              new ErrorClass(
-                "Email Not Sent",
-                400,
-                user.email,
-                "confirmEmail "
-              )
+              new ErrorClass("Email Not Sent", 400, user.email, "confirmEmail ")
             );
           }
-         // if email send success
+          // if email send success
           return res.status(400).json({
             message:
               "Email confirmation link expired. A new confirmation link has been sent to your email.",
@@ -175,7 +159,7 @@ export const confirmEmail = async (req, res, next) => {
           );
         }
       }
-     
+
       return next(new ErrorClass("Token expired", 400, "Token expired"));
     }
 
@@ -185,7 +169,7 @@ export const confirmEmail = async (req, res, next) => {
 
 //-----------------------------------------------------------------------
 
-// signIn User
+// 2-signIn User
 
 /*
   send user data if login in body
@@ -201,13 +185,14 @@ export const signIn = async (req, res, next) => {
   // Check if the user exists
   const user = await User.findOne({ $or: [{ email }, { mobileNumber }] });
   if (!user) {
-     return next( new ErrorClass(
-       "Email or Mobile Number or Password is incorrect",
-       400,
-       { email, password, mobileNumber },
-       "Sign-in API"
-     ));
-
+    return next(
+      new ErrorClass(
+        "Email or Mobile Number or Password is incorrect",
+        400,
+        { email, password, mobileNumber },
+        "Sign-in API"
+      )
+    );
   }
   if (user.isConfirmed === false) {
     return next(
@@ -216,7 +201,6 @@ export const signIn = async (req, res, next) => {
         400,
         user.email,
         "Sign-in API"
-
       )
     );
   }
@@ -224,17 +208,19 @@ export const signIn = async (req, res, next) => {
   // Verify the password
   const isPasswordValid = compareSync(password, user.password);
   if (!isPasswordValid) {
-      return next(new ErrorClass(
+    return next(
+      new ErrorClass(
         "Email or Mobile Number or Password is incorrect",
         400,
         { email, password, mobileNumber },
         "Sign-in API"
-      ));
+      )
+    );
   }
 
   // Sign a JWT token with user's ID and a secret key (make sure to use a strong secret)
   const token = jwt.sign({ userId: user._id }, process.env.LOGIN_SECRET, {
-    expiresIn:"1h",
+    expiresIn: "1h",
   }); // Token expires in 1 hour
 
   // Update status from online
@@ -247,55 +233,181 @@ export const signIn = async (req, res, next) => {
 
 //---------------------------------------------------------------------------------------------
 
-
 // logout user
 /**
- * 
+ *
  * - user must be logged in
  * - user data send in token in header
  * - update the status of the user to "offline"
  * - return "Logout Successful"
- * 
+ *
  */
 export const logOut = async (req, res, next) => {
-    
-    // Ensure req.userId exists
- 
-    if (!req.authUser) {
-      return next(
-        new ErrorClass(
-          "User ID is required",
-          400,
-          "Send Token in headers",
-          "log-out API"
-        )
-      );
-    }
-      
-    // Update the  status of the user to "offline"
-    const updatedUser = await User.findByIdAndUpdate(
+  // Ensure req.userId exists
+
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "log-out API"
+      )
+    );
+  }
+
+  // Update the  status of the user to "offline"
+  const updatedUser = await User.findByIdAndUpdate(
+    req.authUser._id,
+    {
+      status: "offline",
+    },
+    { new: true }
+  );
+  // check user found
+  if (!updatedUser) {
+    return next(new ErrorClass("User not found", 404, "logout API"));
+  }
+
+  return res.status(200).json({ message: "LogOut Successful" });
+};
+
+//-----------------------------------------------------------------------------------------------
+/**
+ * question:
+ * 3. Update account.
+ *    - You can update (email, mobileNumber, recoveryEmail, DOB, lastName, firstName)
+ *    - If the user updates the email or mobile number, make sure that the new data doesn’t conflict with any existing data in your database
+ *    - User must be logged in
+ *    - Only the owner of the account can update his account data
+ */
+
+/**
+ * answer:
+ * Steps:
+ * 1. Send token in header to authenticate
+ * 2. Destructure firstName, lastName, email, mobileNumber, recoveryEmail, DOB from the body
+ * 3. Check email and mobile number uniqueness in all data
+ * 4. If the email is updated, send a verification email
+ * 5. If the email is updated, set isConfirmed to false and status to offline, then prompt the user to log in again
+ * 6. Save the updated data
+ * 7. Do not update password or role
+ */
+
+export const updateAccount = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "update account API"
+      )
+    );
+  }
+
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "update account API"
+      )
+    );
+  }
+
+  // Destructure firstName, lastName, email, mobileNumber, recoveryEmail, DOB from the request body
+  const { firstName, lastName, email, mobileNumber, recoveryEmail, DOB } =
+    req.body;
+
+  // Check email or mobile number uniqueness
+  const existingUser = await User.findOne({
+    $or: [{ email }, { mobileNumber }],
+  });
+  console.log("existingUser", existingUser);
+  // If an existing user with the same email or mobile number is found, return an error
+  if (existingUser) {
+    return next(
+      new ErrorClass(
+        "Email or Mobile Number already exists",
+        400,
+        "Email or Mobile Number already exists",
+        "update account API"
+      )
+    );
+  }
+
+  // If the email is updated, send a verification email
+  if (email && email !== req.authUser.email) {
+    // Update isConfirmed to false and status to offline
+    const userInstance = await User.findByIdAndUpdate(
       req.authUser._id,
       {
+        isConfirmed: false,
         status: "offline",
       },
       { new: true }
     );
-    // check user found
-    if (!updatedUser) {
+
+    // Generate token
+    const token = jwt.sign(
+      { _id: userInstance._id },
+      process.env.CONFIRMATION_SECRET,
+      { expiresIn: "10m" }
+    );
+
+    // Create confirmation link
+    const confirmationLink = `${req.protocol}://${req.headers.host}/user/confirm-email/${token}`;
+
+    // Send email
+    const isEmailSent = await sendEmailService({
+      to: email,
+      subject: "Please confirm your email",
+      textMessage: "Please confirm your email",
+      htmlMessage: `<a href="${confirmationLink}">Click here to confirm your email</a>`,
+    });
+
+    // If the email was not sent, return an error
+    if (isEmailSent.rejected.length) {
       return next(
-        new ErrorClass("User not found", 404 , "logout API")
+        new ErrorClass(
+          "Email Not Sent",
+          400,
+          "Email Not Sent",
+          email,
+          "update account API"
+        )
       );
     }
+  }
 
-    return res.status(200).json({ message: "LogOut Successful" });
-  
+  // Update the user data
+  const updatedUser = await User.findByIdAndUpdate(
+    req.authUser._id,
+    {
+      firstName,
+      lastName,
+      email,
+      mobileNumber,
+      recoveryEmail,
+      DOB,
+      username: `${firstName || req.authUser.firstName}${
+        lastName || req.authUser.lastName
+      }`,
+    },
+    { new: true }
+  );
+
+  // Return success response
+  return res.status(200).json({ message: "Update Successful", updatedUser });
 };
-
-
 
 //------------------------------------------------------------------------------------------------
 /**
- *  delete user 
+ *  4- delete user 
  * - only the owner of the account can delete his account data
    - User must be loggedIn
    user data send in token in header
@@ -311,9 +423,10 @@ export const deleteUser = async (req, res, next) => {
         400,
         "Send Token in headers",
         "delete user API"
-      ));
-  } 
-  // check status online 
+      )
+    );
+  }
+  // check status online
   if (req.authUser.status !== "online") {
     return next(
       new ErrorClass(
@@ -329,14 +442,12 @@ export const deleteUser = async (req, res, next) => {
   const deletedUser = await User.findByIdAndDelete(req.authUser._id);
   // user not found
   if (!deletedUser) {
-    return next(
-      new ErrorClass("User not found", 404, "delete user API")
-    );
-  } 
+    return next(new ErrorClass("User not found", 404, "delete user API"));
+  }
   return res.status(200).json({ message: "User deleted successfully" });
 };
 //--------------------------------------------------------------------------------------------
- // 5. Get user account data 
+// 5. Get user account data
 //     - only the owner of the account can get his account data
 //     - User must be loggedIn
 
@@ -374,8 +485,8 @@ export const getAccountData = async (req, res, next) => {
   return res.status(200).json({ userData });
 };
 //-----------------------------------------------------------
-// 6. Get profile data for another user 
-// - send the userId in params or query 
+// 6. Get profile data for another user
+// - send the userId in params or query
 /**
     send userId in params or query
     - check if user exists
@@ -455,11 +566,8 @@ export const updatePassword = async (req, res, next) => {
   // destruct old password and new password from body
   const { oldPassword, newPassword } = req.body;
   // check if old password not match compare password API
-  const oldPasswordMatch = compareSync(
-    oldPassword,
-    req.authUser.password
-  )
-  // check old password match 
+  const oldPasswordMatch = compareSync(oldPassword, req.authUser.password);
+  // check old password match
   if (!oldPasswordMatch) {
     return next(
       new ErrorClass(
@@ -471,8 +579,8 @@ export const updatePassword = async (req, res, next) => {
     );
   }
   // hash new password
-   
-  const hashedPassword =hashSync(newPassword , +process.env.SALT_ROUNDS);
+
+  const hashedPassword = hashSync(newPassword, +process.env.SALT_ROUNDS);
   // update password
   const updatedPassword = await User.findByIdAndUpdate(
     req.authUser._id,
@@ -490,5 +598,8 @@ export const updatePassword = async (req, res, next) => {
       )
     );
   }
-  return res.status(200).json({ message: "Password updated successfully" ,updatedPassword});
+
+  return res
+    .status(200)
+    .json({ message: "Password updated successfully", updatedPassword });
 };

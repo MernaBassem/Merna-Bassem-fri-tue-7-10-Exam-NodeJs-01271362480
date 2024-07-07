@@ -8,7 +8,8 @@ import {
   SignInSchema,
   generalSchemaCheckOnlyToken,
   profileSchema,
-  updatePasswordSchema
+  updatePasswordSchema,
+  updateUserSchema,
 } from "./user.schema.js";
 import { authenticate } from "../../Middlewares/authentication.middleware.js";
 
@@ -33,6 +34,13 @@ router.post(
   errorHandler(authenticate()),
   errorHandler(validationMiddleware(generalSchemaCheckOnlyToken)),
   errorHandler(userController.logOut)
+);
+// update user api
+router.patch(
+  "/updateAccount",
+  errorHandler(authenticate()),
+  errorHandler(validationMiddleware(updateUserSchema)),
+  errorHandler(userController.updateAccount)
 );
 // delete user api
 router.delete(
@@ -60,5 +68,5 @@ router.patch(
   errorHandler(authenticate()),
   errorHandler(validationMiddleware(updatePasswordSchema)),
   errorHandler(userController.updatePassword)
-)
+);
 export default router;
