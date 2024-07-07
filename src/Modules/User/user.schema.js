@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { systemRoles } from "../../utils/system-roles.utils.js";
-import { generalRules } from "../../utils/general-rules.utils.js";
+import { generalRules, objectIdValidation } from "../../utils/general-rules.utils.js";
 
 /* user schema validation all input before the arrive to api sign_up user
   the validation only data in body
@@ -93,7 +93,8 @@ export const SignInSchema = {
         minDomainSegments: 2,
         maxDomainSegments: 4,
         tlds: { allow: ["com", "net", "org"] },
-      }).messages({
+      })
+      .messages({
         "string.email": "Email is not valid",
         "string.base": "Email must be a string",
         "any.required": "Email is required",
@@ -122,11 +123,11 @@ export const SignInSchema = {
 //------------------------------------------------------------------
 
 /**
- * logout schema to validate
+ * generalSchemaCheckOnlyToken schema to validate
   - token in header
  */
 
-export const LogoutSchema = {
+export const generalSchemaCheckOnlyToken = {
   headers: Joi.object({
     token: Joi.string().required().messages({
       "string.base": "Token must be a string",
@@ -137,18 +138,57 @@ export const LogoutSchema = {
 };
 //------------------------------------------------------------------------------
 
+/*
+  schema user profile through send id user in query or params
+*/
+export const profileSchema = Joi.object({
+  params: Joi.object({
+    userId: Joi.string().custom(objectIdValidation, 'Object Id Validation').required().messages({
+      'any.required': 'ID is required in params',
+      'string.base': 'ID must be a string',
+    }),
+  }),
+  query: Joi.object({
+    userId: Joi.string().custom(objectIdValidation, 'Object Id Validation').required().messages({
+      'any.required': 'ID is required in query',
+      'string.base': 'ID must be a string',
+    }),
+  }),
+}).or('params', 'query'); // Use or to ensure either params or query contains userId
+
+//--------------------------------------------------------------------------------------
 /**
- * delete schema to validate
-  - token in header
+ *  schema update password
+ * check validation of the old password and new password from body
  */
 
-export const DeleteSchema = {
-  headers: Joi.object({
-    token: Joi.string().required().messages({
-      "string.base": "Token must be a string",
-      "any.required": "Token is required",
-    }),
-    ...generalRules.headers,
+export const updatePasswordSchema = {
+  body: Joi.object({
+    oldPassword: Joi.string()
+      .pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .required()
+      .messages({
+        "string.pattern.base":
+          "oldPassword must have at least one lowercase letter, one uppercase letter, one number and one special character",
+        "any.required": "You need to provide a oldPassword",
+        "string.min":
+          "oldPassword should have a minimum length of 3 characters",
+        "string.base": "oldPassword must be a string",
+      }),
+    newPassword: Joi.string()
+      .pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .required()
+      .messages({
+        "string.pattern.base":
+          "newPassword must have at least one lowercase letter, one uppercase letter, one number and one special character",
+        "any.required": "You need to provide a newPassword",
+        "string.min":
+          "newPassword should have a minimum length of 3 characters",
+        "string.base": "newPassword must be a string",
+      }),
   }),
 };
-//------------------------------------------------------------------------------

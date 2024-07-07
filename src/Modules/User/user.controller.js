@@ -30,7 +30,6 @@ export const signUp = async (req, res, next) => {
   // Check if the email already exists
   const isEmailExists = await User.findOne({ email });
   if (isEmailExists) {
-    console.log("email exist", isEmailExists);
 
     return next(
       new ErrorClass(
@@ -44,7 +43,6 @@ export const signUp = async (req, res, next) => {
   // check if the phone already exists
   const isMobileNumberExist = await User.findOne({ mobileNumber });
   if (isMobileNumberExist) {
-    console.log("phone exist", isMobileNumberExist);
     return next(
       new ErrorClass(
         "MobilNumber already exists",
@@ -150,9 +148,7 @@ export const confirmEmail = async (req, res, next) => {
             htmlMessage: `<a href="${newConfirmationLink}">Click here to confirm your email</a>`,
           });
 
-          console.log(
-            `Email sent status: ${JSON.stringify(isEmailSent, null, 2)}`
-          );
+         
           // error if email not send
           if (isEmailSent.rejected.length) {
             return next(
@@ -170,7 +166,6 @@ export const confirmEmail = async (req, res, next) => {
               "Email confirmation link expired. A new confirmation link has been sent to your email.",
           });
         } catch (emailErr) {
-          console.error("Error sending email:", emailErr);
           return next(
             new ErrorClass(
               "Failed to send new confirmation email",
@@ -239,7 +234,7 @@ export const signIn = async (req, res, next) => {
 
   // Sign a JWT token with user's ID and a secret key (make sure to use a strong secret)
   const token = jwt.sign({ userId: user._id }, process.env.LOGIN_SECRET, {
-    expiresIn: "1h",
+    expiresIn:"1h",
   }); // Token expires in 1 hour
 
   // Update status from online
@@ -309,7 +304,6 @@ export const logOut = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   // Ensure req.userId exists
-  console.log(req.authUser);
   if (!req.authUser) {
     return next(
       new ErrorClass(
@@ -340,4 +334,161 @@ export const deleteUser = async (req, res, next) => {
     );
   } 
   return res.status(200).json({ message: "User deleted successfully" });
+};
+//--------------------------------------------------------------------------------------------
+ // 5. Get user account data 
+//     - only the owner of the account can get his account data
+//     - User must be loggedIn
+
+export const getAccountData = async (req, res, next) => {
+  // Ensure req.userId exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "get account data API"
+      )
+    );
+  }
+
+  // check status online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get account data API"
+      )
+    );
+  }
+
+  // get user data only owner the take id from req.authUser
+  const userData = await User.findById(req.authUser._id);
+  // check user found
+  if (!userData) {
+    return next(new ErrorClass("User not found", 404, "get account data API"));
+  }
+  return res.status(200).json({ userData });
+};
+//-----------------------------------------------------------
+// 6. Get profile data for another user 
+// - send the userId in params or query 
+/**
+    send userId in params or query
+    - check if user exists
+    - get user data
+    - return user data
+
+ */
+export const getProfileData = async (req, res, next) => {
+  // Destruct userId from params or query
+  const { userId } = req.params;
+  const { userId: queryUserId } = req.query;
+
+  // Check if userId is provided in params or query
+  if (!userId && !queryUserId) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send User ID in params or query",
+        "get profile data API"
+      )
+    );
+  }
+
+  // Use userId from params if available, otherwise use from query
+  const idToSearch = userId || queryUserId;
+
+  // Get user data
+  const userData = await User.findById(idToSearch);
+
+  // Check if user is found
+  if (!userData) {
+    return next(new ErrorClass("User not found", 404, "get profile data API"));
+  }
+
+  // Return user data
+  return res.status(200).json({ userData });
+};
+//-----------------------------------------------------------------------------
+// 7-Update password for user login
+/**  only the owner of the account can update his password
+  User must be loggedIn
+  user data send in token in header
+  check status online
+  destruct old password and new password from body
+  if old password not match return error compare password
+  else hash new password
+  update password
+  return message "Password updated successfully"
+*/
+
+export const updatePassword = async (req, res, next) => {
+  // Ensure req.userId exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "update password API"
+      )
+    );
+  }
+
+  // check status online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "update password API"
+      )
+    );
+  }
+
+  // destruct old password and new password from body
+  const { oldPassword, newPassword } = req.body;
+  // check if old password not match compare password API
+  const oldPasswordMatch = compareSync(
+    oldPassword,
+    req.authUser.password
+  )
+  // check old password match 
+  if (!oldPasswordMatch) {
+    return next(
+      new ErrorClass(
+        "Old password not match with user password",
+        400,
+        "Old password not match with user password",
+        "update password API"
+      )
+    );
+  }
+  // hash new password
+   
+  const hashedPassword =hashSync(newPassword , +process.env.SALT_ROUNDS);
+  // update password
+  const updatedPassword = await User.findByIdAndUpdate(
+    req.authUser._id,
+    { password: hashedPassword },
+    { new: true }
+  );
+  // check if password updated
+  if (!updatedPassword) {
+    return next(
+      new ErrorClass(
+        "Password not updated",
+        400,
+        "Password not updated",
+        "update password API"
+      )
+    );
+  }
+  return res.status(200).json({ message: "Password updated successfully" ,updatedPassword});
 };
