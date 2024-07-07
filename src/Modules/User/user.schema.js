@@ -268,3 +268,39 @@ export const updateUserSchema = {
     ...generalRules.headers,
   }),
 };
+//----------------------------------------------------------------------------
+
+
+/*
+  schema user get all users data have recovery email
+*/
+export const recoveryEmailSchema = Joi.object({
+  params: Joi.object({
+    recoveryEmail: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        maxDomainSegments: 4,
+        tlds: { allow: ["com", "net", "org"] },
+      })
+      .messages({
+        "any.required": "Recovery Email",
+
+        "string.email": "Recovery Email is not valid",
+        "string.base": "Recovery Email must be a string",
+      }),
+  }),
+  query: Joi.object({
+    recoveryEmail: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        maxDomainSegments: 4,
+        tlds: { allow: ["com", "net", "org"] },
+      })
+      .messages({
+        "any.required": "Recovery Email",
+
+        "string.email": "Recovery Email is not valid",
+        "string.base": "Recovery Email must be a string",
+      }),
+  }),
+}).or("params", "query"); // Use or to ensure either params or query contains userId

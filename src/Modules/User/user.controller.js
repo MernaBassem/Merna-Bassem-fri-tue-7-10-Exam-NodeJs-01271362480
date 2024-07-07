@@ -603,3 +603,55 @@ export const updatePassword = async (req, res, next) => {
     .status(200)
     .json({ message: "Password updated successfully", updatedPassword });
 };
+
+//-----------------------------------------------------------------------
+/*
+ ** question
+ Get all accounts associated to a specific recovery Email 
+ send recovery email in params or query
+*/
+/*
+** answer
+   1- send recovery email in params or query
+   2- check if users exists have same recovery email
+   3- get users data
+   4-check in data if users exists
+   5- return users data
+*/
+
+export const getRecoveryEmail = async (req, res, next) => {
+  // destruct recovery email from params or query
+  const { recoveryEmail } = req.params;
+  const { recoveryEmail: queryRecoveryEmail } = req.query;
+  // check if recovery email is provided in params or query
+  if (!recoveryEmail && !queryRecoveryEmail) {
+    return next(
+      new ErrorClass(
+        "Recovery Email is required",
+        400,
+        "Send Recovery Email in params or query",
+        "get recovery email API"
+      )
+    );
+  }
+
+  // Use recovery email from params if available, otherwise use from query
+  const emailToSearch = recoveryEmail || queryRecoveryEmail;
+  // check if users exists have same recovery email
+  const users = await User.find({ recoveryEmail: emailToSearch });
+  console.log(users);
+  // check if users exists
+  if (users.length === 0) {
+    return next(
+      new ErrorClass(
+        "Users not found associated to this recovery email",
+        404,
+        "Users not found associated to this recovery email",
+        "get recovery email API"
+      )
+    );
+  }
+  // return users data
+  return res.status(200).json({ count: users.length ,users });
+}
+

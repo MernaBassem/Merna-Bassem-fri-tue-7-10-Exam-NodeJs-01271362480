@@ -10,6 +10,7 @@ import {
   profileSchema,
   updatePasswordSchema,
   updateUserSchema,
+  recoveryEmailSchema,
 } from "./user.schema.js";
 import { authenticate } from "../../Middlewares/authentication.middleware.js";
 
@@ -69,4 +70,11 @@ router.patch(
   errorHandler(validationMiddleware(updatePasswordSchema)),
   errorHandler(userController.updatePassword)
 );
+//Get all accounts associated to a specific recovery Email 
+//send recovery email in params or query
+router.get(
+  "/getRecoveryEmail/:recoveryEmail?",
+  errorHandler(validationMiddleware(recoveryEmailSchema)),
+  errorHandler(userController.getRecoveryEmail)
+)
 export default router;
