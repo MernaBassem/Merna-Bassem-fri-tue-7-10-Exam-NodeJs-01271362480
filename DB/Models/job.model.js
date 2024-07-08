@@ -8,7 +8,6 @@
 6. technicalSkills ( array of skills, like  **nodejs  , typescript** ,…)
 7. softSkills (array of Skills , like **time management , team worker,**.. )
 8. addedBy( what is the **compantHrId** who is added this job)
-
 */
 
 import mongoose from "mongoose";

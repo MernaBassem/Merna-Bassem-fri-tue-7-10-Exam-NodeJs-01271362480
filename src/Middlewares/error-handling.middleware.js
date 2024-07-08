@@ -7,7 +7,7 @@ export const errorHandler = (API) => {
       next(new ErrorClass("Internal Server error", 500, err.message));
     });
   };
-};
+}; 
 
 export const globaleResponse = (err, req, res, next) => {
   if (err) {

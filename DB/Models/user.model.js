@@ -15,7 +15,7 @@
 import mongoose from "mongoose";
 import { systemRoles } from "../../src/utils/system-roles.utils.js";
 import Company from "./company.model.js";
-import Application  from './application.model.js';  // Import Application model
+import Application from "./application.model.js"; // Import Application model
 
 const { Schema, model } = mongoose;
 
@@ -77,25 +77,36 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    otp: { type: String , default:null },
-    otpExpiry: { type: Date , default:null },
+    otp: { type: String, default: null },
+    otpExpiry: { type: Date, default: null },
   },
   { timestamps: true, versionKey: "version_key" }
 );
 
 // The username value is the combination of the value of the first name and the second name
 // Middleware to set username before saving
-userSchema.pre('validate', function(next) {
+userSchema.pre("validate", function (next) {
   this.username = `${this.firstName}${this.lastName}`;
   next();
 });
-// if user delete this related user deleted
-userSchema.pre("remove", async function (next) {
-  await Company.deleteMany({ companyHR: this._id });
-  await Application.deleteMany({ userId: this._id });
-  next();
+
+// Middleware to handle related deletions when a user is removed
+// userSchema.pre("remove", async function (next) {
+//   try {
+//     if (this.role === systemRoles.Company_HR) {
+//       const company = await Company.findOne({ companyHR: this._id });
+//       if (company) {
+//         await company.remove();
+//       }
+//     }
+//     await Application.deleteMany({ userId: this._id });
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+userSchema.post(`remove`, (user) => {
+  Company.remove({ companyHR: user._id });
 });
-
-
 const User = mongoose.models.User || model("User", userSchema);
 export default User;

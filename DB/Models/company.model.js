@@ -10,7 +10,7 @@
 */
 
 import mongoose from "mongoose";
-import Job from "./job.model";
+import Job from "./job.model.js";
 const { Schema, model } = mongoose;
 
 const companySchema = new mongoose.Schema(
