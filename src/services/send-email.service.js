@@ -25,7 +25,7 @@ export const sendEmailService = async ({
   });
   // configer message ( mail )
   const info = await transporter.sendMail({
-    from: "Active Email <mernabassem21@gmail.com>",
+    from: "No Retry <mernabassem21@gmail.com>",
     to,
     subject,
     text: textMessage,

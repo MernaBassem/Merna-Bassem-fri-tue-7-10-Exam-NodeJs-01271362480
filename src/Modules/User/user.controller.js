@@ -603,6 +603,153 @@ export const updatePassword = async (req, res, next) => {
     .status(200)
     .json({ message: "Password updated successfully", updatedPassword });
 };
+//----------------------------------------------------------------------
+
+//Forget password (make sure of your data security specially the OTP and the newPassword )
+
+/**
+/forgot-password Route:
+
+Find User: Find the user by email. If the user does not exist, return a 404 error.
+Generate OTP: Generate a 6-character OTP using crypto.randomBytes.
+Save OTP and Expiry: Save the OTP and its expiration time to the user's record.
+Send OTP via Email: Use nodemailer to send the OTP to the user's email.
+
+
+
+*/
+
+// forget password
+
+export const forgetPassword = async (req, res, next) => {
+  // destruct email from body
+  const { email } = req.body;
+  // check if email is provided
+  if (!email) {
+    return next(
+      new ErrorClass(
+        "Email is required",
+        400,
+        "Send Email in body",
+        "forget password API"
+      )
+    );
+  }
+  // find user by email
+  const user = await User.findOne({ email });
+  // check if user exists
+  if (!user) {
+    return next(
+      new ErrorClass(
+        "User not found",
+        404,
+        "User not found",
+        "forget password API"
+      )
+    );
+  }
+
+  // generate otp
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  // save otp and expiry in DataBase
+  const updateUser = await User.findByIdAndUpdate(
+    user._id,
+    { otp, otpExpiry: Date.now() + 3600000 },
+    { new: true }
+  );
+
+  //  send otp via email
+  const isEmailSent = await sendEmailService({
+    to: email,
+    subject: "Your OTP",
+    textMessage: "Your OTP",
+    htmlMessage: `<h1>${otp}</h1>`,
+  });
+  // check isEmailSent
+  if (!isEmailSent) {
+    return next(
+      new ErrorClass(
+        "Email not sent",
+        400,
+        "Email not sent",
+        "forget password API"
+      )
+    );
+  }
+  // return in state success
+  return res
+    .status(200)
+    .json({ message: "OTP sent successfully", isEmailSent });
+};
+//--------------------------------------
+/**
+ * /reset-password Route:
+
+  Find User: Find the user by email. If the user does not exist, return a 404 error.
+  Verify OTP: Check if the provided OTP matches the one saved in the database and if it has not expired. If invalid, return a 400 error.
+  Reset Password: Update the user's password, clear the OTP and its expiration time, and save the user record.
+ */
+
+export const resetPassword = async (req, res, next) => {
+  const { email, otp, newPassword } = req.body;
+  // check if email and otp are provided
+  if (!email || !otp || !newPassword) {
+    return next(
+      new ErrorClass(
+        "Email, OTP and New Password are required",
+        400,
+        "Send Email, OTP and New Password in body",
+        "reset password API"
+      )
+    );
+  }
+  // find user by email
+  const user = await User.findOne({ email });
+  // check if user exists
+  if (!user) {
+    return next(
+      new ErrorClass(
+        "User not found",
+        404,
+        "User not found",
+        "reset password API"
+      )
+    );
+  }
+  console.log("userrrrrrr", user);
+  // check otp valid
+  if (user.otp !== otp) {
+    return next(
+      new ErrorClass("Invalid OTP", 400, "Invalid OTP", "reset password API")
+    );
+  }
+  // check otp expired
+  console.log(user.otpExpiry);
+  if (Date.now() > user.otpExpiry) {
+    return next(
+      new ErrorClass("expired OTP", 400, "Invalid OTP", "reset password API")
+    );
+  }
+  // update password
+  const hashedPassword = hashSync(newPassword, +process.env.SALT_ROUNDS);
+  const updateUser = await User.findByIdAndUpdate(
+    user._id,
+    { password: hashedPassword },
+    { new: true }
+  );
+  // clear otp and otpExpiry
+  const clearOTP = await User.findByIdAndUpdate(
+    user._id,
+    { otp: null, otpExpiry: null, status: "offline" },
+    { new: true }
+  );
+  // return success reset password
+  return res
+    .status(200)
+    .json({
+      message: "Password reset successfully try login use new password",
+    });
+};
 
 //-----------------------------------------------------------------------
 /*
@@ -652,6 +799,5 @@ export const getRecoveryEmail = async (req, res, next) => {
     );
   }
   // return users data
-  return res.status(200).json({ count: users.length ,users });
-}
-
+  return res.status(200).json({ count: users.length, recoveryEmail, users });
+};

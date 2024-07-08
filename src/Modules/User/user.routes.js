@@ -77,4 +77,8 @@ router.get(
   errorHandler(validationMiddleware(recoveryEmailSchema)),
   errorHandler(userController.getRecoveryEmail)
 )
+// forget password
+router.post("/forgetPassword",errorHandler(userController.forgetPassword))
+// reset password 
+router.post("/resetPassword",errorHandler(userController.resetPassword))
 export default router;
