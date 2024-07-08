@@ -8,7 +8,7 @@ import {
 
 // create company validation
 
-export const CreateCompanySchema = {
+export const CreateCompanySchema =Joi.object({
   body: Joi.object({
     companyName: Joi.string().min(3).max(15).required().messages({
       "string.min": "companyName should have a minimum length of 3 characters",
@@ -60,8 +60,7 @@ export const CreateCompanySchema = {
       "any.required": "Token is required",
     }),
     ...generalRules.headers,
-  }),
-};
+}),});
 //-------------------------------------------------------
 // update company schema validation
 /**
@@ -70,7 +69,7 @@ export const CreateCompanySchema = {
  * 3- check id in params
  */
 
-export const UpdateCompanySchema = {
+export const UpdateCompanySchema = Joi.object({
   body: Joi.object({
     companyName: Joi.string().min(3).max(15).messages({
       "string.min": "companyName should have a minimum length of 3 characters",
@@ -125,14 +124,14 @@ export const UpdateCompanySchema = {
         "string.base": "ID must be a string",
       }),
   }),
-};
+});
 //----------------------------------
 // delete company schema validation
 /**
  * 1- check token in header
  * 2- check id in params
  */
-export const DeleteCompanySchema = {
+export const DeleteCompanySchema =Joi.object( {
   headers: Joi.object({
     token: Joi.string().required().messages({
       "string.base": "Token must be a string",
@@ -152,4 +151,33 @@ export const DeleteCompanySchema = {
       }),
   }),
 
-}
+})
+//------------------------------------------------
+// search company schema validation
+/**
+ * 1- check token in header
+ * 2- check id in params
+ */
+export const SearchCompanySchema = Joi.object({
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  params: Joi.object({
+    name: Joi.string().min(1).required().messages({
+      "any.required": "CompanyName is required in params",
+      "string.base": "CompanyName must be a string",
+      "string.min": "CompanyName should have a minimum length of 1 characters",
+    }),
+  }),
+  query: Joi.object({
+    name: Joi.string().min(1).required().messages({
+      "any.required": "CompanyName is required in query",
+      "string.base": "CompanyName must be a string",
+      "string.min": "CompanyName should have a minimum length of 1 characters",
+    }),
+  }),
+}).or("params", "query"); // Use or to ensure either params or query contains userId
