@@ -1,5 +1,13 @@
-// user model use mongoose
+// job model use mongoose
 /*
+1. jobTitle ( Like **NodeJs back-end developer** )
+2. jobLocation ( **onsite, remotely, hybrid** )
+3. workingTime ( **part-time , full-time** )
+4. seniorityLevel ( enum of **Junior, Mid-Level, Senior,Team-Lead, CTO** )
+5. jobDescription ( identify what is the job and what i will do i accepted )
+6. technicalSkills ( array of skills, like  **nodejs  , typescript** ,…)
+7. softSkills (array of Skills , like **time management , team worker,**.. )
+8. addedBy( what is the **compantHrId** who is added this job)
 
 */
 

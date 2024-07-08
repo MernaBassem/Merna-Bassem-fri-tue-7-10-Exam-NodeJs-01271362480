@@ -1,4 +1,4 @@
-// user model use mongoose
+// company model use mongoose
 /*
 1. companyName ⇒ ( unique )
 2. description (Like what are the actual activities and services provided by the company ? )
