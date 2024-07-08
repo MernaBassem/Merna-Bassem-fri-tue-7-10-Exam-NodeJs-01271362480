@@ -91,9 +91,6 @@ export const createCompany = async (req, res, next) => {
  * 6- check owner online 
  * 7- update company
  * 8- return updated company
- * 
- *  
- * 
  */
 
 export const updateCompany = async (req, res, next) => {
