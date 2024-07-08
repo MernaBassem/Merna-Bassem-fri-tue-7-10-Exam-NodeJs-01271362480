@@ -57,10 +57,7 @@ const jobSchema = new mongoose.Schema(
   { timestamps: true, versionKey: "version_key" }
 );
 
-jobSchema.pre("remove", async function (next) {
-  await Application.deleteMany({ jobId: this._id });
-  next();
-});
+
 
 
 const Job = mongoose.models.Job || model("Job", jobSchema);

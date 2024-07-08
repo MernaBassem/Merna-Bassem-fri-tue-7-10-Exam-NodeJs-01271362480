@@ -51,10 +51,6 @@ const companySchema = new mongoose.Schema(
   { timestamps: true, versionKey: "version_key" }
 );
 
-companySchema.pre("remove", async function (next) {
-  await Job.deleteMany({ addedBy: this.companyHR });
-  next();
-});
 
 const Company = mongoose.models.Company || model("Company", companySchema);
 export default Company;

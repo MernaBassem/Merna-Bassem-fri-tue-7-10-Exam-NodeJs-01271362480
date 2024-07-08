@@ -8,8 +8,10 @@ import { ErrorClass } from "../../utils/error-class.utils.js";
 
 /**
  * 1- check token send
- * 2- add company
- * 3- return company added
+ * 2- check user online
+ * 3- destruct
+ * 4- add company
+ * 5- return company added
  */
 
 export const createCompany = async (req, res, next) => {

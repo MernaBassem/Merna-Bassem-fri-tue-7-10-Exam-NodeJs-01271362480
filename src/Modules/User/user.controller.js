@@ -5,6 +5,7 @@ import { sendEmailService } from "../../services/send-email.service.js";
 import User from "../../../DB/Models/user.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
 import Company from "../../../DB/Models/company.model.js";
+import Job from "../../../DB/Models/job.model.js";
 /*
  * @param {object} req
  * @param {object} res
@@ -445,8 +446,10 @@ export const deleteUser = async (req, res, next) => {
   if (!deletedUser) {
     return next(new ErrorClass("User not found", 404, "delete user API"));
   }
+  // delete company related to user
   await Company.deleteMany({ companyHR: req.authUser._id });
-
+  // delete job related to user
+  await Job.deleteMany({ addedBy: req.authUser._id });
   return res.status(200).json({ message: "User deleted successfully" });
 };
 //--------------------------------------------------------------------------------------------

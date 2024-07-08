@@ -90,23 +90,5 @@ userSchema.pre("validate", function (next) {
   next();
 });
 
-// Middleware to handle related deletions when a user is removed
-// userSchema.pre("remove", async function (next) {
-//   try {
-//     if (this.role === systemRoles.Company_HR) {
-//       const company = await Company.findOne({ companyHR: this._id });
-//       if (company) {
-//         await company.remove();
-//       }
-//     }
-//     await Application.deleteMany({ userId: this._id });
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-// userSchema.post(`remove`, (user) => {
-//   Company.remove({ companyHR: user._id });
-// });
 const User = mongoose.models.User || model("User", userSchema);
 export default User;

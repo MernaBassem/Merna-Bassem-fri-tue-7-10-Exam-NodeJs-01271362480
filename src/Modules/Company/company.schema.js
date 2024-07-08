@@ -8,7 +8,7 @@ import {
 
 // create company validation
 
-export const CreateCompanySchema =Joi.object({
+export const CreateCompanySchema ={
   body: Joi.object({
     companyName: Joi.string().min(3).max(15).required().messages({
       "string.min": "companyName should have a minimum length of 3 characters",
@@ -60,7 +60,7 @@ export const CreateCompanySchema =Joi.object({
       "any.required": "Token is required",
     }),
     ...generalRules.headers,
-}),});
+}),};
 //-------------------------------------------------------
 // update company schema validation
 /**
@@ -69,7 +69,7 @@ export const CreateCompanySchema =Joi.object({
  * 3- check id in params
  */
 
-export const UpdateCompanySchema = Joi.object({
+export const UpdateCompanySchema ={
   body: Joi.object({
     companyName: Joi.string().min(3).max(15).messages({
       "string.min": "companyName should have a minimum length of 3 characters",
@@ -124,14 +124,14 @@ export const UpdateCompanySchema = Joi.object({
         "string.base": "ID must be a string",
       }),
   }),
-});
+};
 //----------------------------------
 // delete company schema validation
 /**
  * 1- check token in header
  * 2- check id in params
  */
-export const DeleteCompanySchema =Joi.object( {
+export const DeleteCompanySchema ={
   headers: Joi.object({
     token: Joi.string().required().messages({
       "string.base": "Token must be a string",
@@ -151,7 +151,7 @@ export const DeleteCompanySchema =Joi.object( {
       }),
   }),
 
-})
+}
 //------------------------------------------------
 // search company schema validation
 /**
