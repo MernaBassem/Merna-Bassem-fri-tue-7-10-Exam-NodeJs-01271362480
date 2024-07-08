@@ -9,6 +9,7 @@ import { validationMiddleware } from "../../Middlewares/validation.middleware.js
 import {
   AddJobSchema,
   DeleteJobSchema,
+  FilterJobSchema,
   UpdateJobSchema,
 } from "./job.schema.js";
 
@@ -38,4 +39,12 @@ router.delete(
   errorHandler(validationMiddleware(DeleteJobSchema)),
   errorHandler(jobController.deleteJob)
 )
+// filter job api
+router.get(
+  "/filterJob",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
+  errorHandler(validationMiddleware(FilterJobSchema)),
+  errorHandler(jobController.filterJobs)
+);
 export default router;

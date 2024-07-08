@@ -212,3 +212,126 @@ export const deleteJob = async (req, res, next) => {
   // return deleted job
   return res.status(200).json({ message : "Job deleted successfully",deletedJob });
 }
+//----------------------------------
+/*
+4. Get all Jobs with their company’s information.
+    - apply authorization with the role ( User , Company_HR )
+*/
+
+/*
+ 1- check send token
+ 2- check user online
+ 3- get all jobs with their company’s information
+ 4- return all jobs
+*/
+
+// export const getAllJobs = async (req, res, next) => {
+//   // Ensure req.authUser exists
+//   if (!req.authUser) {
+//     return next(
+//       new ErrorClass(
+//         "User ID is required",
+//         400,
+//         "Send Token in headers",
+//         "get all jobs API"
+//       )
+//     );
+//   }
+//   // Check if the user is online
+//   if (req.authUser.status !== "online") {
+//     return next(
+//       new ErrorClass(
+//         "User must be online",
+//         400,
+//         "User must be online",
+//         "get all jobs API"
+//       )
+//     );
+//   } 
+//   // get all jobs with their company’s information
+//   const jobs = await Job.find(
+
+//   );
+//   // return all jobs
+//   return res.status(200).json({count : jobs.length, jobs });
+// }
+// //
+
+//-------------------------------------------------------------------
+
+/*
+6. Get all Jobs that match the following filters 
+    - allow user to filter with workingTime , jobLocation , 
+    seniorityLevel and jobTitle,technicalSkills
+    - one or more of them should applied
+    **Exmaple** : if the user selects the   
+    **workingTime** is **part-time** and the **jobLocation** is **onsite** 
+    , we need to return all jobs that match these conditions
+    - apply authorization with the role ( User , Company_HR )
+
+*/
+/*
+1- check send token
+2- check user online
+3- get all jobs that match the following filters
+4- return all jobs
+*/
+
+export const filterJobs = async (req, res,next) => {
+    
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "filter jobs API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "filter jobs API")
+    );
+  }
+   // destructure query
+    const { 
+        workingTime,
+         jobLocation,
+          seniorityLevel, 
+          jobTitle, 
+          technicalSkills 
+        } = req.query;
+    // create filters
+    let filters = {};
+    // check workingTime exists
+    if (workingTime) {
+        filters.workingTime = workingTime;
+    }
+     //check jobLocation exists
+    if (jobLocation) {
+        filters.jobLocation = jobLocation;
+    }
+// check seniorityLevel exists
+    if (seniorityLevel) {
+        filters.seniorityLevel = seniorityLevel;
+    }
+// check jobTitle exists
+    if (jobTitle) {
+        filters.jobTitle = { $regex: jobTitle, $options: 'i' }; // Case-insensitive search
+    }
+// check technicalSkills exists
+    if (technicalSkills) {
+        filters.technicalSkills = { $all: technicalSkills.split(',') }; // Match all specified skills
+    }
+    const jobs = await Job.find(filters);
+    return res.status(200).json({ count: jobs.length, jobs });
+};
+
+

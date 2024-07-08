@@ -165,3 +165,52 @@ export const DeleteJobSchema = {
   }),
 };
 //------------------------------------------------
+
+// filter job schema validation
+/**
+ * 1- check token in header
+ * 2- allow user to filter with workingTime , jobLocation , seniorityLevel and jobTitle,technicalSkills
+ */
+export const FilterJobSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+
+  query: Joi.object({
+    workingTime: Joi.string().valid("full-time", "part-time").messages({
+      "any.only": "workingTime must be one of the following: full-time, part-time",
+      "string.base": "workingTime must be a string",
+      "string.empty": "workingTime cannot be empty",
+    }),
+    jobLocation: Joi.string().valid("onsite", "remotely", "hybrid").messages({
+      "any.only": "jobLocation must be one of the following: onsite, remotely, hybrid",
+      "string.base": "jobLocation must be a string",
+      "string.empty": "jobLocation cannot be empty",
+    }),
+    seniorityLevel: Joi.string()
+      .valid("Junior", "Mid-Level", "Senior", "Team-Lead", "CTO")
+      .messages({
+        "any.only": "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
+        "string.base": "seniorityLevel must be a string",
+        "string.empty": "seniorityLevel cannot be empty",
+      }),
+    jobTitle: Joi.string().min(3).messages({
+      "string.min": "jobTitle should have a minimum length of 3 characters",
+      "string.base": "jobTitle must be a string",
+    }),
+    technicalSkills: Joi.array().items(Joi.string()).messages({
+      "array.base": "technicalSkills must be an array",
+      "array.includes": "technicalSkills must be an array of strings",
+    }),
+    softSkills: Joi.array().items(Joi.string()).messages({
+      "array.base": "softSkills must be an array",
+      "array.includes": "softSkills must be an array of strings",
+    }),
+  }).min(1).messages({
+    "object.min": "At least one field is required send in query parameters sush as workingTime,jobLocation,seniorityLevel,jobTitle,technicalSkills,softSkills",
+  }),
+};
