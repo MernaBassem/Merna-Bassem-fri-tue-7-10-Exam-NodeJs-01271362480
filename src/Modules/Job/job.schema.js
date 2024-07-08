@@ -59,16 +59,17 @@ export const AddJobSchema = {
       "string.base": "jobDescription must be a string",
     }),
     // technicalSkills valid array of string
-    technicalSkills: Joi.array().required().messages({
+    technicalSkills: Joi.array().items(Joi.string()).required().messages({
       "any.required": "technicalSkills is required",
       "array.base": "technicalSkills must be an array",
-      "string.base": "technicalSkills must be a string",
+      "array.includes": "softSkills must be an array of strings",
     }),
     // softSkills valid array of string
-    softSkills: Joi.array().required().messages({
-      "any.required": "softSkills is required",
+    softSkills: Joi.array().items(Joi.string()).required().messages({
       "array.base": "softSkills must be an array",
-      "string.base": "softSkills must be a string",
+      "any.required": "technicalSkills is required",
+
+      "array.includes": "softSkills must be an array of strings",
     }),
   }),
   headers: Joi.object({
@@ -80,3 +81,60 @@ export const AddJobSchema = {
   }),
 };
 //-------------------------------------------------------------------
+
+// Update job schema
+export const UpdateJobSchema = {
+  params: Joi.object({
+    jobId: Joi.string().custom(objectIdValidation, "Object ID Validation").required().messages({
+      "any.required": "Job ID is required",
+      "string.base": "Job ID must be a string",
+      "string.pattern": "Job ID must be a valid ObjectId",
+    }),
+  }),
+  body: Joi.object({
+    jobTitle: Joi.string().min(3).messages({
+      "string.min": "jobTitle should have a minimum length of 3 characters",
+      "string.base": "jobTitle must be a string",
+    }),
+    jobLocation: Joi.string()
+      .valid("onsite", "remotely", "hybrid")
+      .messages({
+        "any.only": "jobLocation must be one of the following: onsite, remotely, hybrid",
+        "string.base": "jobLocation must be a string",
+        "string.empty": "jobLocation cannot be empty",
+      }),
+    workingTime: Joi.string()
+      .valid("full-time", "part-time")
+      .messages({
+        "any.only": "workingTime must be one of the following: full-time, part-time",
+        "string.base": "workingTime must be a string",
+        "string.empty": "workingTime cannot be empty",
+      }),
+    seniorityLevel: Joi.string()
+      .valid("Junior", "Mid-Level", "Senior", "Team-Lead", "CTO")
+      .messages({
+        "any.only": "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
+        "string.base": "seniorityLevel must be a string",
+        "string.empty": "seniorityLevel cannot be empty",
+      }),
+    jobDescription: Joi.string().min(3).messages({
+      "string.min": "jobDescription should have a minimum length of 3 characters",
+      "string.base": "jobDescription must be a string",
+    }),
+    technicalSkills: Joi.array().items(Joi.string()).messages({
+      "array.base": "technicalSkills must be an array",
+      "array.includes": "technicalSkills must be an array of strings",
+    }),
+    softSkills: Joi.array().items(Joi.string()).messages({
+      "array.base": "softSkills must be an array",
+      "array.includes": "softSkills must be an array of strings",
+    }),
+  }).min(1), // Require at least one field to update
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  })
+};

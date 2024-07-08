@@ -105,7 +105,7 @@ export const UpdateCompanySchema ={
         "string.email": "Company Email is not valid",
         "string.base": "Company Email must be a string",
       }),
-  }),
+  }).min(1),
 
   headers: Joi.object({
     token: Joi.string().required().messages({
