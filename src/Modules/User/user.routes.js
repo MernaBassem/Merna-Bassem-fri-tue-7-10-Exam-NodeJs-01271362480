@@ -11,6 +11,8 @@ import {
   updatePasswordSchema,
   updateUserSchema,
   recoveryEmailSchema,
+  forgetPasswordSchema,
+  resetPasswordSchema,
 } from "./user.schema.js";
 import { authenticate } from "../../Middlewares/authentication.middleware.js";
 
@@ -70,15 +72,24 @@ router.patch(
   errorHandler(validationMiddleware(updatePasswordSchema)),
   errorHandler(userController.updatePassword)
 );
-//Get all accounts associated to a specific recovery Email 
+//Get all accounts associated to a specific recovery Email
 //send recovery email in params or query
 router.get(
   "/getRecoveryEmail/:recoveryEmail?",
   errorHandler(validationMiddleware(recoveryEmailSchema)),
   errorHandler(userController.getRecoveryEmail)
-)
+);
 // forget password
-router.post("/forgetPassword",errorHandler(userController.forgetPassword))
-// reset password 
-router.post("/resetPassword",errorHandler(userController.resetPassword))
+router.post(
+  "/forgetPassword",
+  errorHandler(validationMiddleware(forgetPasswordSchema)),
+  errorHandler(userController.forgetPassword)
+);
+// reset password
+router.post(
+  "/resetPassword",
+  errorHandler(validationMiddleware(resetPasswordSchema)),
+
+  errorHandler(userController.resetPassword)
+);
 export default router;

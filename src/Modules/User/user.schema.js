@@ -1,6 +1,9 @@
 import Joi from "joi";
 import { systemRoles } from "../../utils/system-roles.utils.js";
-import { generalRules, objectIdValidation } from "../../utils/general-rules.utils.js";
+import {
+  generalRules,
+  objectIdValidation,
+} from "../../utils/general-rules.utils.js";
 
 /* user schema validation all input before the arrive to api sign_up user
   the validation only data in body
@@ -143,18 +146,24 @@ export const generalSchemaCheckOnlyToken = {
 */
 export const profileSchema = Joi.object({
   params: Joi.object({
-    userId: Joi.string().custom(objectIdValidation, 'Object Id Validation').required().messages({
-      'any.required': 'ID is required in params',
-      'string.base': 'ID must be a string',
-    }),
+    userId: Joi.string()
+      .custom(objectIdValidation, "Object Id Validation")
+      .required()
+      .messages({
+        "any.required": "ID is required in params",
+        "string.base": "ID must be a string",
+      }),
   }),
   query: Joi.object({
-    userId: Joi.string().custom(objectIdValidation, 'Object Id Validation').required().messages({
-      'any.required': 'ID is required in query',
-      'string.base': 'ID must be a string',
-    }),
+    userId: Joi.string()
+      .custom(objectIdValidation, "Object Id Validation")
+      .required()
+      .messages({
+        "any.required": "ID is required in query",
+        "string.base": "ID must be a string",
+      }),
   }),
-}).or('params', 'query'); // Use or to ensure either params or query contains userId
+}).or("params", "query"); // Use or to ensure either params or query contains userId
 
 //--------------------------------------------------------------------------------------
 /**
@@ -198,7 +207,7 @@ export const updatePasswordSchema = {
  * schema update user
  * check validation of the new user data from body
  * check token in header
- * 
+ *
  */
 
 export const updateUserSchema = {
@@ -253,7 +262,7 @@ export const updateUserSchema = {
         "any.required": "You need to provide a mobile number",
         "string.base": "mobile number must be a string",
       }),
-    role : Joi.forbidden().messages({
+    role: Joi.forbidden().messages({
       "any.unknown": "User PAssword is not allowed to be updated",
     }),
     status: Joi.string().valid("online", "offline").messages({
@@ -269,7 +278,6 @@ export const updateUserSchema = {
   }),
 };
 //----------------------------------------------------------------------------
-
 
 /*
   schema user get all users data have recovery email
@@ -304,3 +312,60 @@ export const recoveryEmailSchema = Joi.object({
       }),
   }),
 }).or("params", "query"); // Use or to ensure either params or query contains userId
+
+//--------------------------------------------------------
+// forget password schema
+
+export const forgetPasswordSchema = Joi.object({
+  body: Joi.object({
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        maxDomainSegments: 4,
+        tlds: { allow: ["com", "net", "org"] },
+      })
+      .required()
+      .messages({
+        "string.email": "Email is not valid",
+        "any.required": "Email is required",
+        "string.base": "Email must be a string",
+      }),
+  }),
+});
+//--------------------------------------------------------------
+// reset password schema
+// send email , otp , newPassword
+
+export const resetPasswordSchema = Joi.object({
+  body: Joi.object({
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        maxDomainSegments: 4,
+        tlds: { allow: ["com", "net", "org"] },
+      })
+      .required()
+      .messages({
+        "string.email": "Email is not valid",
+        "any.required": "Email is required",
+        "string.base": "Email must be a string",
+      }),
+    otp: Joi.string().required().messages({
+      "string.base": "Otp must be a string",
+      "any.required": "Otp is required",
+    }),
+    newPassword: Joi.string()
+      .pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .required()
+      .messages({
+        "string.pattern.base":
+          "New Password must have at least one lowercase letter, one uppercase letter, one number and one special character",
+        "any.required": "You need to provide a New Password",
+        "string.min":
+          "New Password should have a minimum length of 3 characters",
+        "string.base": "New Password must be a string",
+      }),
+  }),
+});

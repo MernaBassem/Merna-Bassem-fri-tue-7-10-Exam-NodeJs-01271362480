@@ -619,7 +619,6 @@ Send OTP via Email: Use nodemailer to send the OTP to the user's email.
 
 */
 
-// forget password
 
 export const forgetPassword = async (req, res, next) => {
   // destruct email from body
@@ -716,7 +715,6 @@ export const resetPassword = async (req, res, next) => {
       )
     );
   }
-  console.log("userrrrrrr", user);
   // check otp valid
   if (user.otp !== otp) {
     return next(
