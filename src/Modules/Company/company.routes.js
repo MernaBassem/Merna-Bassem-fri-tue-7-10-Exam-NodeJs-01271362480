@@ -6,7 +6,7 @@ import { authenticate } from "../../Middlewares/authentication.middleware.js";
 import { authorizationMiddleware } from "../../Middlewares/authorization.middleware.js";
 import { roles } from "../../utils/system-roles.utils.js";
 import { validationMiddleware } from "../../Middlewares/validation.middleware.js";
-import { CreateCompanySchema, UpdateCompanySchema } from "./company.schema.js";
+import { CreateCompanySchema, DeleteCompanySchema, UpdateCompanySchema } from "./company.schema.js";
 
 const router = Router();
 // createCompany api
@@ -24,5 +24,13 @@ router.patch(
   errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
   errorHandler(validationMiddleware(UpdateCompanySchema)),
   errorHandler(companyController.updateCompany)
+)
+// deleteCompany api
+router.delete(
+  "/deleteCompany/:id",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
+  errorHandler(validationMiddleware(DeleteCompanySchema)),
+  errorHandler(companyController.deleteCompany)
 )
 export default router;

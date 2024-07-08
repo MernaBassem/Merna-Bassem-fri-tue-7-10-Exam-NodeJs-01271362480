@@ -105,8 +105,8 @@ userSchema.pre("validate", function (next) {
 //     next(error);
 //   }
 // });
-userSchema.post(`remove`, (user) => {
-  Company.remove({ companyHR: user._id });
-});
+// userSchema.post(`remove`, (user) => {
+//   Company.remove({ companyHR: user._id });
+// });
 const User = mongoose.models.User || model("User", userSchema);
 export default User;

@@ -186,3 +186,88 @@ export const updateCompany = async (req, res, next) => {
   // return company
   return res.status(201).json({ message : "Updated company", company });
 }
+//---------------------------------------------------------
+/**
+ * 3. Delete company data
+    - only the company owner can delete the data
+    - apply authorization with role ( Company_HR)
+ */
+
+    /**
+ * 1- check token send
+ * 2- check id in params
+ * 3- check company exists
+ * 4- apply authorization
+ * 5- check company owner
+ * 6- check owner online 
+ * 7- delete company
+ * 8- return delete  company
+ */
+
+export const deleteCompany = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "Delete account API"
+      )
+    );
+  }
+  // check send id company in params
+  if (!req.params.id) {
+    return next(
+      new ErrorClass(
+        "Company ID is required",
+        400,
+        "Send Company ID in params",
+        "Delete account API"
+      )
+    );
+  } 
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "Delete account API"
+      )
+    );
+  }
+
+  // Check if the company exists
+  const company = await Company.findById(req.params.id);
+  if (!company) {
+    return next(
+      new ErrorClass(
+        "Company not found",
+        404,
+        "Company not found",
+        "Delete account API"
+      )
+    );
+  }
+
+  // Check if the company owner
+  if (company.companyHR.toString() !== req.authUser._id.toString()) {
+    return next(
+      new ErrorClass(
+        "No one other than the owner is allowed to delete this company",
+        403,
+        "No one other than the owner is allowed to delete this company",
+        "Delete account API"
+      )
+    );
+  }
+
+  // delete company
+  const deleteCompany = await Company.findByIdAndDelete(req.params.id);
+  // return company
+  return res
+    .status(200)
+    .json({ message: "Company deleted successfully", deleteCompany });
+}

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { sendEmailService } from "../../services/send-email.service.js";
 import User from "../../../DB/Models/user.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
+import Company from "../../../DB/Models/company.model.js";
 /*
  * @param {object} req
  * @param {object} res
@@ -444,6 +445,8 @@ export const deleteUser = async (req, res, next) => {
   if (!deletedUser) {
     return next(new ErrorClass("User not found", 404, "delete user API"));
   }
+  await Company.deleteMany({ companyHR: req.authUser._id });
+
   return res.status(200).json({ message: "User deleted successfully" });
 };
 //--------------------------------------------------------------------------------------------
@@ -619,7 +622,6 @@ Send OTP via Email: Use nodemailer to send the OTP to the user's email.
 
 */
 
-
 export const forgetPassword = async (req, res, next) => {
   // destruct email from body
   const { email } = req.body;
@@ -742,11 +744,9 @@ export const resetPassword = async (req, res, next) => {
     { new: true }
   );
   // return success reset password
-  return res
-    .status(200)
-    .json({
-      message: "Password reset successfully try login use new password",
-    });
+  return res.status(200).json({
+    message: "Password reset successfully try login use new password",
+  });
 };
 
 //-----------------------------------------------------------------------
