@@ -8,6 +8,7 @@ import { roles } from "../../utils/system-roles.utils.js";
 import { validationMiddleware } from "../../Middlewares/validation.middleware.js";
 import {
   AddJobSchema,
+  ApplyJobSchema,
   DeleteJobSchema,
   FilterJobSchema,
   UpdateJobSchema,
@@ -46,5 +47,13 @@ router.get(
   errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
   errorHandler(validationMiddleware(FilterJobSchema)),
   errorHandler(jobController.filterJobs)
+);
+// apply job api
+router.post(
+  "/applyJob",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.USER)),
+  errorHandler(validationMiddleware(ApplyJobSchema)),
+  errorHandler(jobController.applyToJob)
 );
 export default router;

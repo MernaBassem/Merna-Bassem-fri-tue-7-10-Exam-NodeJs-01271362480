@@ -214,3 +214,37 @@ export const FilterJobSchema = {
     "object.min": "At least one field is required send in query parameters sush as workingTime,jobLocation,seniorityLevel,jobTitle,technicalSkills,softSkills",
   }),
 };
+//----------------------------------------------------------
+// schema apply job
+/**
+ * 1- check token in header
+ * 2- check id in body { jobId, userTechSkills, userSoftSkills }
+ */
+export const ApplyJobSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  body: Joi.object({
+    jobId: Joi.string()
+      .custom(objectIdValidation, "Object Id Validation")
+      .required()
+      .messages({
+        "any.required": "jobId is required in body",
+        "string.base": "jobId must be a string",
+      }),
+    userTechSkills: Joi.array().required().items(Joi.string()).messages({
+      "array.base": "userTechSkills must be an array",
+      "array.includes": "userTechSkills must be an array of strings",
+      "any.required": "userTechSkills is required in body",
+    }),
+    userSoftSkills: Joi.array().required().items(Joi.string()).messages({
+      "array.base": "userSoftSkills must be an array",
+      "array.includes": "userSoftSkills must be an array of strings",
+      "any.required": "userSoftSkills is required in body",
+    }),
+  }),
+};

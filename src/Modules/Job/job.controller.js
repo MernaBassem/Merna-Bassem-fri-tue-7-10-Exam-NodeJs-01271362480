@@ -4,6 +4,7 @@
 2. apply authorization with the role ( Company_HR )
 */
 
+import Application from "../../../DB/Models/application.model.js";
 import Job from "../../../DB/Models/job.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
 
@@ -258,22 +259,13 @@ export const deleteJob = async (req, res, next) => {
 // //
 
 //-------------------------------------------------------------------
-
-/*
-6. Get all Jobs that match the following filters 
-    - allow user to filter with workingTime , jobLocation , 
-    seniorityLevel and jobTitle,technicalSkills
-    - one or more of them should applied
-    **Exmaple** : if the user selects the   
-    **workingTime** is **part-time** and the **jobLocation** is **onsite** 
-    , we need to return all jobs that match these conditions
-    - apply authorization with the role ( User , Company_HR )
-
-*/
+// 6. Filter Jobs
 /*
 1- check send token
 2- check user online
-3- get all jobs that match the following filters
+ - allow user to filter with workingTime , jobLocation , 
+    seniorityLevel and jobTitle,technicalSkills
+3- get all jobs that match the following filters 
 4- return all jobs
 */
 
@@ -333,5 +325,75 @@ export const filterJobs = async (req, res,next) => {
     const jobs = await Job.find(filters);
     return res.status(200).json({ count: jobs.length, jobs });
 };
+//---------------------------------------------------
+/*
+7. Apply to Job
+    - This API will add a new document in the application Collections with the new data
+    - apply authorization with the role ( User )
 
+Application :
+1. jobId ( the Job Id )
+2. userId ( the applier Id )
+3. userTechSkills ( array of the applier technical Skills )
+4. userSoftSkills ( array of the applier soft Skills )
 
+*/
+
+/*
+1- check send token
+2- check user online
+- destruct req.body
+3- check job exists
+3- create new application
+4- return application
+*/
+
+export const applyToJob = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "apply to job API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "apply to job API"
+      )
+    );
+  }
+  // destruct req.body
+  const { jobId, userTechSkills, userSoftSkills } = req.body;
+  // check job exists
+  const job = await Job.findOne({ _id: jobId });
+  if (!job) {
+    return next(
+      new ErrorClass(
+        "Job not found",
+        400,
+        "Job not found",
+        "apply to job API"
+      )
+    );
+  }
+  // create new application
+  const application = new Application({
+    jobId,
+    userId: req.authUser._id,
+    userTechSkills,
+    userSoftSkills,
+  });
+  // save application
+  await application.save();
+  // return application
+  return res.status(200).json({ application });
+}
