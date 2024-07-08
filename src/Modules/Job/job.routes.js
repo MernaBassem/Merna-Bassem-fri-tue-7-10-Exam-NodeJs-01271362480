@@ -6,7 +6,11 @@ import { authenticate } from "../../Middlewares/authentication.middleware.js";
 import { authorizationMiddleware } from "../../Middlewares/authorization.middleware.js";
 import { roles } from "../../utils/system-roles.utils.js";
 import { validationMiddleware } from "../../Middlewares/validation.middleware.js";
-import { AddJobSchema, UpdateJobSchema } from "./job.schema.js";
+import {
+  AddJobSchema,
+  DeleteJobSchema,
+  UpdateJobSchema,
+} from "./job.schema.js";
 
 
 const router = Router();
@@ -26,4 +30,12 @@ router.patch(
   errorHandler(validationMiddleware(UpdateJobSchema)),
   errorHandler(jobController.updateJob)
 );
+// delete job api
+router.delete(
+  "/deleteJob/:jobId",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
+  errorHandler(validationMiddleware(DeleteJobSchema)),
+  errorHandler(jobController.deleteJob)
+)
 export default router;

@@ -152,3 +152,63 @@ export const updateJob = async (req, res, next) => {
    return res.status(200).json({ updatedJob });
 }
 //---------------------------------------------------------
+/*
+3. Delete Job
+    - apply authorization with the role ( Company_HR )
+*/
+/*
+1- send token
+2- check user online
+3- check job exists
+4- check addedBy is same as req.authUser
+5- delete job
+6- return deleted job
+*/
+export const deleteJob = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "delete job API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "delete job API"
+      )
+    );
+  }
+
+  // Check if job exists
+  const job = await Job.findById(req.params.jobId);
+  if (!job) {
+    return next(
+      new ErrorClass("Job not found", 404, "Job not found", "delete job API")
+    );
+  }
+  // Check if addedBy is same as req.authUser
+  if (job.addedBy.toString() !== req.authUser._id.toString()) {
+    return next(
+      new ErrorClass(
+        "You are not authorized to delete this job",
+        403,
+        "You are not authorized to delete this job",
+        "delete job API"
+      )
+    );
+  }
+
+  // delete job
+  const deletedJob = await Job.findByIdAndDelete(req.params.jobId);
+  // return deleted job
+  return res.status(200).json({ message : "Job deleted successfully",deletedJob });
+}
