@@ -14,6 +14,9 @@
 
 import mongoose from "mongoose";
 import { systemRoles } from "../../src/utils/system-roles.utils.js";
+import Company from "./company.model.js";
+import Application  from './application.model.js';  // Import Application model
+
 const { Schema, model } = mongoose;
 
 const userSchema = new mongoose.Schema(
@@ -86,6 +89,13 @@ userSchema.pre('validate', function(next) {
   this.username = `${this.firstName}${this.lastName}`;
   next();
 });
+// if user delete this related user deleted
+userSchema.pre("remove", async function (next) {
+  await Company.deleteMany({ companyHR: this._id });
+  await Application.deleteMany({ userId: this._id });
+  next();
+});
+
 
 const User = mongoose.models.User || model("User", userSchema);
 export default User;
