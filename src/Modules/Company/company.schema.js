@@ -205,3 +205,27 @@ export const SearchCompanySchema = Joi.object({
     }),
   }),
 }).or("params", "query"); // Use or to ensure either params or query contains userId
+//---------------------------------------
+// get application
+/*
+1- check token in header
+2- check id in params
+*/
+export const GetApplicationSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  params: Joi.object({
+    id: Joi.string()
+      .custom(objectIdValidation, "Object Id Validation")
+      .required()
+      .messages({
+        "any.required": "Job ID is required in params",
+        "string.base": "Job ID must be a string",
+      }),
+  }),
+};

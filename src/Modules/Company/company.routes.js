@@ -6,7 +6,7 @@ import { authenticate } from "../../Middlewares/authentication.middleware.js";
 import { authorizationMiddleware } from "../../Middlewares/authorization.middleware.js";
 import { roles } from "../../utils/system-roles.utils.js";
 import { validationMiddleware } from "../../Middlewares/validation.middleware.js";
-import { CreateCompanySchema, DeleteCompanySchema, GetCompanySchema, SearchCompanySchema, UpdateCompanySchema } from "./company.schema.js";
+import { CreateCompanySchema, DeleteCompanySchema, GetApplicationSchema, GetCompanySchema, SearchCompanySchema, UpdateCompanySchema } from "./company.schema.js";
 
 const router = Router();
 // createCompany api
@@ -48,5 +48,13 @@ router.get(
   errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
   errorHandler(validationMiddleware(SearchCompanySchema)),
   errorHandler(companyController.searchCompany)
+);
+// get application 
+router.get(
+  "/getApplication/:id",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
+  errorHandler(validationMiddleware(GetApplicationSchema)),
+  errorHandler(companyController.getApplications)
 );
 export default router;

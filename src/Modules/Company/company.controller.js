@@ -3,6 +3,7 @@
     - apply authorization with role ( Company_HR )
  */
 
+import Application from "../../../DB/Models/application.model.js";
 import Company from "../../../DB/Models/company.model.js";
 import Job from "../../../DB/Models/job.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
@@ -438,4 +439,103 @@ export const searchCompany = async (req, res, next) => {
   }
   // return company
   return res.status(200).json({ company });
+};
+
+/*-------------------------------------------------------------------------------------- */
+/*
+6. Get all applications for specific Job
+    - each company Owner can take a look at the applications for his jobs only, he has no access to other companies’ application
+    - return each application with the user data, not the userId
+    - apply authorization with role (  Company_HR )
+*/
+/*
+1- check token send
+2- check user online
+3- check jobId in params
+4- check job exists
+5- check addedBy is same as req.authUser
+6- get all application related to this job and user info
+7- return all applications
+*/
+
+export const getApplications = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "get applications API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get applications API"
+      )
+    );
+  } 
+
+  // check send id job in params
+  if (!req.params.id) {
+    return next(
+      new ErrorClass(
+        "Job ID is required",
+        400,
+        "Send Job ID in params",
+        "get applications API"
+      )
+    );
+  }
+
+  // Check if the job exists
+  const job = await Job.findById(req.params.id);
+  if (!job) {
+    return next(
+      new ErrorClass(
+        "Job not found",
+        404,
+        "Job not found",
+        "get applications API"
+      )
+    );
+  }
+
+  // check addedBy is same as req.authUser
+  if (job.addedBy.toString() !== req.authUser._id.toString()) {
+    return next(
+      new ErrorClass(
+        "You don't have access to this job",
+        400,
+        "You don't have access to this job",
+        "get applications API"
+      )
+    );
+  }
+
+  // get all application related to this job and user info
+  const applications = await Application.find({ jobId: job._id }).populate(
+    "jobId"
+  ).populate("userId");
+  if (!applications) {
+    return next(
+      new ErrorClass(
+        "Applications not found",
+        404,
+        "Applications not found",
+        "get applications API"
+      )
+    );
+  }
+  if(applications.length === 0){
+    return res.status(200).json({message:"No applications found"});
+  }
+  // return all applications
+  return res.status(200).json({count:applications.length ,applications });
 };
