@@ -263,3 +263,18 @@ export const ApplyJobSchema = {
     }),
   }),
 };
+
+//-----------------------
+//get all jobs schema validation
+/**
+ * 1- check token in header
+ */
+export const GetAllJobsAndCompanyInfo = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+};

@@ -266,37 +266,35 @@ export const deleteJob = async (req, res, next) => {
  4- return all jobs
 */
 
-// export const getAllJobs = async (req, res, next) => {
-//   // Ensure req.authUser exists
-//   if (!req.authUser) {
-//     return next(
-//       new ErrorClass(
-//         "User ID is required",
-//         400,
-//         "Send Token in headers",
-//         "get all jobs API"
-//       )
-//     );
-//   }
-//   // Check if the user is online
-//   if (req.authUser.status !== "online") {
-//     return next(
-//       new ErrorClass(
-//         "User must be online",
-//         400,
-//         "User must be online",
-//         "get all jobs API"
-//       )
-//     );
-//   } 
-//   // get all jobs with their company’s information
-//   const jobs = await Job.find(
+export const getAllJobsAndCompanyInfo = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "get all jobs API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get all jobs API"
+      )
+    );
+  }
+  // get all jobs with their company’s information
+  const jobs = await Job.find().populate("companyId");
+  // return all jobs
+  return res.status(200).json({ count: jobs.length, jobs });
+};
 
-//   );
-//   // return all jobs
-//   return res.status(200).json({count : jobs.length, jobs });
-// }
-// //
 
 //-------------------------------------------------------------------
 // 6. Filter Jobs

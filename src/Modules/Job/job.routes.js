@@ -11,9 +11,9 @@ import {
   ApplyJobSchema,
   DeleteJobSchema,
   FilterJobSchema,
+  GetAllJobsAndCompanyInfo,
   UpdateJobSchema,
 } from "./job.schema.js";
-
 
 const router = Router();
 // addJob api
@@ -39,7 +39,15 @@ router.delete(
   errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
   errorHandler(validationMiddleware(DeleteJobSchema)),
   errorHandler(jobController.deleteJob)
-)
+);
+// get all jobs api
+router.get(
+  "/getAllJobsAndCompanyInfo",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
+  errorHandler(validationMiddleware(GetAllJobsAndCompanyInfo)),
+  errorHandler(jobController.getAllJobsAndCompanyInfo)
+);
 // filter job api
 router.get(
   "/filterJob",
