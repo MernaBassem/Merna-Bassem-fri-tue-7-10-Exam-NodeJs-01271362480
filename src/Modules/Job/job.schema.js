@@ -71,6 +71,15 @@ export const AddJobSchema = {
 
       "array.includes": "softSkills must be an array of strings",
     }),
+    // companyId valid ObjectId
+    companyId: Joi.string()
+      .custom(objectIdValidation, "Object ID Validation")
+      .required()
+      .messages({
+        "any.required": "companyId is required",
+        "string.base": "companyId must be a string",
+        "string.pattern": "companyId must be a valid ObjectId",
+      }),
   }),
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -129,6 +138,12 @@ export const UpdateJobSchema = {
       "array.base": "softSkills must be an array",
       "array.includes": "softSkills must be an array of strings",
     }),
+    companyId: Joi.string()
+      .custom(objectIdValidation, "Object ID Validation")
+      .messages({
+        "string.base": "companyId must be a string",
+        "string.pattern": "companyId must be a valid ObjectId",
+      }),
   }).min(1), // Require at least one field to update
   headers: Joi.object({
     token: Joi.string().required().messages({

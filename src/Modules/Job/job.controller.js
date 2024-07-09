@@ -5,6 +5,7 @@
 */
 
 import Application from "../../../DB/Models/application.model.js";
+import Company from "../../../DB/Models/company.model.js";
 import Job from "../../../DB/Models/job.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
 
@@ -50,8 +51,27 @@ export const addJob = async (req, res, next) => {
     jobDescription,
     technicalSkills,
     softSkills,
+    companyId,
 
   } = req.body;
+  // check company exists
+  const company = await Company.findById(companyId);
+  if (!company) {
+    return next(
+      new ErrorClass("Company not found", 400, "Company not found", "add job API")
+    );
+  }
+  // check companyHR in company is same as req.authUser._id
+  if (company.companyHR.toString() !== req.authUser._id.toString()) {
+    return next(
+      new ErrorClass(
+        "This job with this company cannot be added to the company owner companyHR is not same as req.authUser._id",
+        400,
+        "This job with this company cannot be added to the company owner companyHR is not same as req.authUser._id",
+        "add job API"
+      )
+    );
+  }
   // Create new job
   // create new company
   const jobInstance = new Job({
@@ -62,6 +82,7 @@ export const addJob = async (req, res, next) => {
     jobDescription,
     technicalSkills,
     softSkills,
+    companyId,
     addedBy : req.authUser._id,
   });
   // save company
@@ -119,6 +140,7 @@ export const updateJob = async (req, res, next) => {
     jobDescription,
     technicalSkills,
     softSkills,
+    companyId
 
   } = req.body;
   // Check if job exists
@@ -139,7 +161,24 @@ export const updateJob = async (req, res, next) => {
       )
     );
   }
-
+  // check companyId exist or not in company model
+  const company = await Company.findById(companyId);
+  if (!company) {
+    return next(
+      new ErrorClass("Company not found", 400, "Company not found", "update job API")
+    );
+  }
+  // check companyHR in company is same as req.authUser._id
+  if (company.companyHR.toString() !== req.authUser._id.toString()) {
+    return next(
+      new ErrorClass(
+        "This job with this company cannot be added to the company owner",
+        400,
+        "This job with this company cannot be added to the company owner",
+        "update job API"
+      )
+    );
+  }
   // update Job use save
    if(jobTitle) job.jobTitle = jobTitle
    if(jobLocation) job.jobLocation = jobLocation
@@ -148,6 +187,7 @@ export const updateJob = async (req, res, next) => {
    if(jobDescription) job.jobDescription = jobDescription
    if(technicalSkills) job.technicalSkills = technicalSkills
    if(softSkills) job.softSkills = softSkills
+   if(companyId) job.companyId = companyId
    const updatedJob = await job.save();
    // return updated job
    return res.status(200).json({ updatedJob });
