@@ -51,6 +51,15 @@ const companySchema = new mongoose.Schema(
   { timestamps: true, versionKey: "version_key" }
 );
 
+// Virtual field to populate jobs
+companySchema.virtual("jobs", {
+  ref: "Job",
+  localField: "_id",
+  foreignField: "companyId",
+});
+
+// Ensure virtual fields are included in the output
+companySchema.set("toJSON", { virtuals: true });
 
 const Company = mongoose.models.Company || model("Company", companySchema);
 export default Company;

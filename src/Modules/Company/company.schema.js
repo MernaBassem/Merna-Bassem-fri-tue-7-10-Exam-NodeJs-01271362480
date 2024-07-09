@@ -153,6 +153,30 @@ export const DeleteCompanySchema ={
 
 }
 //------------------------------------------------
+// get company schema validation
+/**
+ * 1- check token in header
+ * 2- check id in params
+ */
+export const GetCompanySchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  params: Joi.object({
+    id: Joi.string()
+      .custom(objectIdValidation, "Object Id Validation")
+      .required()
+      .messages({
+        "any.required": "ID is required in params",
+        "string.base": "ID must be a string",
+      }),
+  }),
+};
+//-----------------------------------------------
 // search company schema validation
 /**
  * 1- check token in header

@@ -50,7 +50,7 @@ export const createCompany = async (req, res, next) => {
     numberOfEmployees,
     companyEmail,
   } = req.body;
-   // check companyName unique
+  // check companyName unique
   const isCompanyName = await Company.findOne({ companyName });
   // check isCompanyName
   if (isCompanyName) {
@@ -103,7 +103,7 @@ export const createCompany = async (req, res, next) => {
  * 3- check company exists
  * 4- apply authorization
  * 5- check company owner
- * 6- check owner online 
+ * 6- check owner online
  * 7- update company
  * 8- return updated company
  */
@@ -212,8 +212,8 @@ export const updateCompany = async (req, res, next) => {
   // save company
   await company.save();
   // return company
-  return res.status(201).json({ message : "Updated company", company });
-}
+  return res.status(201).json({ message: "Updated company", company });
+};
 //---------------------------------------------------------
 /**
  * 3. Delete company data
@@ -221,13 +221,13 @@ export const updateCompany = async (req, res, next) => {
     - apply authorization with role ( Company_HR)
  */
 
-    /**
+/**
  * 1- check token send
  * 2- check id in params
  * 3- check company exists
  * 4- apply authorization
  * 5- check company owner
- * 6- check owner online 
+ * 6- check owner online
  * 7- delete company
  * 8- return delete  company
  */
@@ -254,7 +254,7 @@ export const deleteCompany = async (req, res, next) => {
         "Delete Company API"
       )
     );
-  } 
+  }
   // Check if the user is online
   if (req.authUser.status !== "online") {
     return next(
@@ -300,9 +300,78 @@ export const deleteCompany = async (req, res, next) => {
   return res
     .status(200)
     .json({ message: "Company deleted successfully", deleteCompany });
-}
+};
 
 //--------------------------------------------
+/*
+4. Get company data 
+    - send the companyId in params to get the desired company data
+    - return all jobs related to this company
+ */
+/*
+1-check token send
+2- check user online
+3-check id in params
+4- check company exists
+5- return company
+*/
+
+
+export const getCompany = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "get company API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get company API"
+      )
+    );
+  }
+
+  // check send id company in params
+  if (!req.params.id) {
+    return next(
+      new ErrorClass(
+        "Company ID is required",
+        400,
+        "Send Company ID in params",
+        "get company API"
+      )
+    );
+  }
+
+  // Check if the company exists
+  const company = await Company.findById(req.params.id).populate("jobs");
+  if (!company) {
+    return next(
+      new ErrorClass(
+        "Company not found",
+        404,
+        "Company not found",
+        "get company API"
+      )
+    );
+  }
+
+  // return company
+  return res.status(200).json({ message: "Company found", company });
+}
+
+
+//--------------------------------------------------
 /**
  * 5. Search for a company with a name. 
     - apply authorization with the role ( Company_HR and User)
@@ -369,4 +438,4 @@ export const searchCompany = async (req, res, next) => {
   }
   // return company
   return res.status(200).json({ company });
-}
+};
