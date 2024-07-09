@@ -61,8 +61,12 @@ export const CreateCompanySchema ={
     }),
     ...generalRules.headers,
 }),};
+
+
 //-------------------------------------------------------
+
 // update company schema validation
+
 /**
  * 1- check body data
  * 2- check token in header
@@ -125,12 +129,17 @@ export const UpdateCompanySchema ={
       }),
   }),
 };
+
+
 //----------------------------------
+
 // delete company schema validation
+
 /**
  * 1- check token in header
  * 2- check id in params
  */
+
 export const DeleteCompanySchema ={
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -152,12 +161,16 @@ export const DeleteCompanySchema ={
   }),
 
 }
+
 //------------------------------------------------
+
 // get company schema validation
+
 /**
  * 1- check token in header
  * 2- check id in params
  */
+
 export const GetCompanySchema = {
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -176,12 +189,16 @@ export const GetCompanySchema = {
       }),
   }),
 };
+
 //-----------------------------------------------
+
 // search company schema validation
+
 /**
  * 1- check token in header
  * 2- check id in params
- */
+*/
+
 export const SearchCompanySchema = Joi.object({
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -205,12 +222,17 @@ export const SearchCompanySchema = Joi.object({
     }),
   }),
 }).or("params", "query"); // Use or to ensure either params or query contains userId
+
+
 //---------------------------------------
+
 // get application
+
 /*
 1- check token in header
 2- check id in params
 */
+
 export const GetApplicationSchema = {
   headers: Joi.object({
     token: Joi.string().required().messages({
