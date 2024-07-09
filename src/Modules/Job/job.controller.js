@@ -52,13 +52,17 @@ export const addJob = async (req, res, next) => {
     technicalSkills,
     softSkills,
     companyId,
-
   } = req.body;
   // check company exists
   const company = await Company.findById(companyId);
   if (!company) {
     return next(
-      new ErrorClass("Company not found", 400, "Company not found", "add job API")
+      new ErrorClass(
+        "Company not found",
+        400,
+        "Company not found",
+        "add job API"
+      )
     );
   }
   // check companyHR in company is same as req.authUser._id
@@ -83,14 +87,14 @@ export const addJob = async (req, res, next) => {
     technicalSkills,
     softSkills,
     companyId,
-    addedBy : req.authUser._id,
+    addedBy: req.authUser._id,
   });
   // save company
- const newJob = await jobInstance.save();
+  const newJob = await jobInstance.save();
 
   // return created job
   return res.status(201).json({ newJob });
-}
+};
 //---------------------------------------------------------
 /*
 2. Update Job
@@ -105,7 +109,6 @@ export const addJob = async (req, res, next) => {
 6- update Job
 5- return updated job
 */
-
 
 export const updateJob = async (req, res, next) => {
   // Ensure req.authUser exists
@@ -138,10 +141,11 @@ export const updateJob = async (req, res, next) => {
     workingTime,
     seniorityLevel,
     jobDescription,
-    technicalSkills,
-    softSkills,
-    companyId
-
+    technicalSkillsToAdd,
+    technicalSkillsToRemove,
+    softSkillsToAdd,
+    softSkillsToRemove,
+    companyId,
   } = req.body;
   // Check if job exists
   const job = await Job.findById(req.params.jobId);
@@ -162,10 +166,16 @@ export const updateJob = async (req, res, next) => {
     );
   }
   // check companyId exist or not in company model
+if (companyId) {
   const company = await Company.findById(companyId);
   if (!company) {
     return next(
-      new ErrorClass("Company not found", 400, "Company not found", "update job API")
+      new ErrorClass(
+        "Company not found",
+        400,
+        "Company not found",
+        "update job API"
+      )
     );
   }
   // check companyHR in company is same as req.authUser._id
@@ -179,19 +189,41 @@ export const updateJob = async (req, res, next) => {
       )
     );
   }
-  // update Job use save
-   if(jobTitle) job.jobTitle = jobTitle
-   if(jobLocation) job.jobLocation = jobLocation
-   if(workingTime) job.workingTime = workingTime
-   if(seniorityLevel) job.seniorityLevel = seniorityLevel
-   if(jobDescription) job.jobDescription = jobDescription
-   if(technicalSkills) job.technicalSkills = technicalSkills
-   if(softSkills) job.softSkills = softSkills
-   if(companyId) job.companyId = companyId
-   const updatedJob = await job.save();
-   // return updated job
-   return res.status(200).json({ updatedJob });
+   job.companyId = companyId; 
 }
+  // update Job use save
+  if (jobTitle) job.jobTitle = jobTitle;
+  if (jobLocation) job.jobLocation = jobLocation;
+  if (workingTime) job.workingTime = workingTime;
+  if (seniorityLevel) job.seniorityLevel = seniorityLevel;
+  if (jobDescription) job.jobDescription = jobDescription;
+
+  // Dynamic updates for technicalSkills
+  if (technicalSkillsToAdd) {
+    job.technicalSkills = [
+      ...new Set([...job.technicalSkills, ...technicalSkillsToAdd]),
+    ]; // Add unique items
+  }
+  if (technicalSkillsToRemove) {
+    job.technicalSkills = job.technicalSkills.filter(
+      (skill) => !technicalSkillsToRemove.includes(skill)
+    ); // Remove items
+  }
+
+  // Dynamic updates for softSkills
+  if (softSkillsToAdd) {
+    job.softSkills = [...new Set([...job.softSkills, ...softSkillsToAdd])]; // Add unique items
+  }
+  if (softSkillsToRemove) {
+    job.softSkills = job.softSkills.filter(
+      (skill) => !softSkillsToRemove.includes(skill)
+    ); // Remove items
+  }
+
+  const updatedJob = await job.save();
+  // return updated job
+  return res.status(200).json({ updatedJob });
+};
 //---------------------------------------------------------
 /*
 3. Delete Job
@@ -251,10 +283,12 @@ export const deleteJob = async (req, res, next) => {
   // delete job
   const deletedJob = await Job.findByIdAndDelete(req.params.jobId);
   // delete application related to this job
-  await Application.deleteMany({jobId: req.params.jobId});
+  await Application.deleteMany({ jobId: req.params.jobId });
   // return deleted job
-  return res.status(200).json({ message : "Job deleted successfully",deletedJob });
-}
+  return res
+    .status(200)
+    .json({ message: "Job deleted successfully", deletedJob });
+};
 //----------------------------------
 /*
 4. Get all Jobs with their company’s information.
@@ -363,7 +397,7 @@ export const getAllJobsForSpecificCompany = async (req, res, next) => {
 
   // get all jobs for a specific company
   const jobs = await Job.find({ companyId: company._id }).populate("companyId");
-  // if length job 0 
+  // if length job 0
   if (jobs.length === 0) {
     return next(
       new ErrorClass(
@@ -374,10 +408,9 @@ export const getAllJobsForSpecificCompany = async (req, res, next) => {
       )
     );
   }
-  // return all jobs  
+  // return all jobs
   return res.status(200).json({ count: jobs.length, jobs });
 };
-
 
 //-------------------------------------------------------------------
 // 6. Filter Jobs
@@ -390,8 +423,7 @@ export const getAllJobsForSpecificCompany = async (req, res, next) => {
 4- return all jobs
 */
 
-export const filterJobs = async (req, res,next) => {
-    
+export const filterJobs = async (req, res, next) => {
   // Ensure req.authUser exists
   if (!req.authUser) {
     return next(
@@ -410,41 +442,42 @@ export const filterJobs = async (req, res,next) => {
         "User must be online",
         400,
         "User must be online",
-        "filter jobs API")
+        "filter jobs API"
+      )
     );
   }
-   // destructure query
-    const { 
-        workingTime,
-         jobLocation,
-          seniorityLevel, 
-          jobTitle, 
-          technicalSkills 
-        } = req.query;
-    // create filters
-    let filters = {};
-    // check workingTime exists
-    if (workingTime) {
-        filters.workingTime = workingTime;
-    }
-     //check jobLocation exists
-    if (jobLocation) {
-        filters.jobLocation = jobLocation;
-    }
-// check seniorityLevel exists
-    if (seniorityLevel) {
-        filters.seniorityLevel = seniorityLevel;
-    }
-// check jobTitle exists
-    if (jobTitle) {
-        filters.jobTitle = { $regex: jobTitle, $options: 'i' }; // Case-insensitive search
-    }
-// check technicalSkills exists
-    if (technicalSkills) {
-        filters.technicalSkills = { $all: technicalSkills.split(',') }; // Match all specified skills
-    }
-    const jobs = await Job.find(filters);
-    return res.status(200).json({ count: jobs.length, jobs });
+  // destructure query
+  const {
+    workingTime,
+    jobLocation,
+    seniorityLevel,
+    jobTitle,
+    technicalSkills,
+  } = req.query;
+  // create filters
+  let filters = {};
+  // check workingTime exists
+  if (workingTime) {
+    filters.workingTime = workingTime;
+  }
+  //check jobLocation exists
+  if (jobLocation) {
+    filters.jobLocation = jobLocation;
+  }
+  // check seniorityLevel exists
+  if (seniorityLevel) {
+    filters.seniorityLevel = seniorityLevel;
+  }
+  // check jobTitle exists
+  if (jobTitle) {
+    filters.jobTitle = { $regex: jobTitle, $options: "i" }; // Case-insensitive search
+  }
+  // check technicalSkills exists
+  if (technicalSkills) {
+    filters.technicalSkills = { $all: technicalSkills.split(",") }; // Match all specified skills
+  }
+  const jobs = await Job.find(filters);
+  return res.status(200).json({ count: jobs.length, jobs });
 };
 //---------------------------------------------------
 /*
@@ -498,12 +531,7 @@ export const applyToJob = async (req, res, next) => {
   const job = await Job.findOne({ _id: jobId });
   if (!job) {
     return next(
-      new ErrorClass(
-        "Job not found",
-        400,
-        "Job not found",
-        "apply to job API"
-      )
+      new ErrorClass("Job not found", 400, "Job not found", "apply to job API")
     );
   }
   // create new application
@@ -517,4 +545,4 @@ export const applyToJob = async (req, res, next) => {
   await application.save();
   // return application
   return res.status(200).json({ application });
-}
+};

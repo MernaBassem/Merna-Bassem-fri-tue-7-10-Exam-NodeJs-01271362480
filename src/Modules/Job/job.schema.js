@@ -94,49 +94,60 @@ export const AddJobSchema = {
 // Update job schema
 export const UpdateJobSchema = {
   params: Joi.object({
-    jobId: Joi.string().custom(objectIdValidation, "Object ID Validation").required().messages({
-      "any.required": "Job ID is required",
-      "string.base": "Job ID must be a string",
-      "string.pattern": "Job ID must be a valid ObjectId",
-    }),
+    jobId: Joi.string()
+      .custom(objectIdValidation, "Object ID Validation")
+      .required()
+      .messages({
+        "any.required": "Job ID is required",
+        "string.base": "Job ID must be a string",
+        "string.pattern": "Job ID must be a valid ObjectId",
+      }),
   }),
   body: Joi.object({
     jobTitle: Joi.string().min(3).messages({
       "string.min": "jobTitle should have a minimum length of 3 characters",
       "string.base": "jobTitle must be a string",
     }),
-    jobLocation: Joi.string()
-      .valid("onsite", "remotely", "hybrid")
-      .messages({
-        "any.only": "jobLocation must be one of the following: onsite, remotely, hybrid",
-        "string.base": "jobLocation must be a string",
-        "string.empty": "jobLocation cannot be empty",
-      }),
-    workingTime: Joi.string()
-      .valid("full-time", "part-time")
-      .messages({
-        "any.only": "workingTime must be one of the following: full-time, part-time",
-        "string.base": "workingTime must be a string",
-        "string.empty": "workingTime cannot be empty",
-      }),
+    jobLocation: Joi.string().valid("onsite", "remotely", "hybrid").messages({
+      "any.only":
+        "jobLocation must be one of the following: onsite, remotely, hybrid",
+      "string.base": "jobLocation must be a string",
+      "string.empty": "jobLocation cannot be empty",
+    }),
+    workingTime: Joi.string().valid("full-time", "part-time").messages({
+      "any.only":
+        "workingTime must be one of the following: full-time, part-time",
+      "string.base": "workingTime must be a string",
+      "string.empty": "workingTime cannot be empty",
+    }),
     seniorityLevel: Joi.string()
       .valid("Junior", "Mid-Level", "Senior", "Team-Lead", "CTO")
       .messages({
-        "any.only": "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
+        "any.only":
+          "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
         "string.base": "seniorityLevel must be a string",
         "string.empty": "seniorityLevel cannot be empty",
       }),
     jobDescription: Joi.string().min(3).messages({
-      "string.min": "jobDescription should have a minimum length of 3 characters",
+      "string.min":
+        "jobDescription should have a minimum length of 3 characters",
       "string.base": "jobDescription must be a string",
     }),
-    technicalSkills: Joi.array().items(Joi.string()).messages({
-      "array.base": "technicalSkills must be an array",
-      "array.includes": "technicalSkills must be an array of strings",
+    technicalSkillsToAdd: Joi.array().items(Joi.string()).messages({
+      "array.base": "technicalSkillsToAdd must be an array",
+      "array.includes": "technicalSkillsToAdd must be an array of strings",
     }),
-    softSkills: Joi.array().items(Joi.string()).messages({
-      "array.base": "softSkills must be an array",
-      "array.includes": "softSkills must be an array of strings",
+    technicalSkillsToRemove: Joi.array().items(Joi.string()).messages({
+      "array.base": "technicalSkillsToRemove must be an array",
+      "array.includes": "technicalSkillsToRemove must be an array of strings",
+    }),
+    softSkillsToAdd: Joi.array().items(Joi.string()).messages({
+      "array.base": "softSkillsToAdd must be an array",
+      "array.includes": "softSkillsToAdd must be an array of strings",
+    }),
+    softSkillsToRemove: Joi.array().items(Joi.string()).messages({
+      "array.base": "softSkillsToRemove must be an array",
+      "array.includes": "softSkillsToRemove must be an array of strings",
     }),
     companyId: Joi.string()
       .custom(objectIdValidation, "Object ID Validation")
@@ -151,7 +162,7 @@ export const UpdateJobSchema = {
       "any.required": "Token is required",
     }),
     ...generalRules.headers,
-  })
+  }),
 };
 
 //----------------------------------
@@ -197,19 +208,22 @@ export const FilterJobSchema = {
 
   query: Joi.object({
     workingTime: Joi.string().valid("full-time", "part-time").messages({
-      "any.only": "workingTime must be one of the following: full-time, part-time",
+      "any.only":
+        "workingTime must be one of the following: full-time, part-time",
       "string.base": "workingTime must be a string",
       "string.empty": "workingTime cannot be empty",
     }),
     jobLocation: Joi.string().valid("onsite", "remotely", "hybrid").messages({
-      "any.only": "jobLocation must be one of the following: onsite, remotely, hybrid",
+      "any.only":
+        "jobLocation must be one of the following: onsite, remotely, hybrid",
       "string.base": "jobLocation must be a string",
       "string.empty": "jobLocation cannot be empty",
     }),
     seniorityLevel: Joi.string()
       .valid("Junior", "Mid-Level", "Senior", "Team-Lead", "CTO")
       .messages({
-        "any.only": "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
+        "any.only":
+          "seniorityLevel must be one of the following: Junior, Mid-Level, Senior, Team-Lead, CTO",
         "string.base": "seniorityLevel must be a string",
         "string.empty": "seniorityLevel cannot be empty",
       }),
@@ -225,9 +239,12 @@ export const FilterJobSchema = {
       "array.base": "softSkills must be an array",
       "array.includes": "softSkills must be an array of strings",
     }),
-  }).min(1).messages({
-    "object.min": "At least one field is required send in query parameters sush as workingTime,jobLocation,seniorityLevel,jobTitle,technicalSkills,softSkills",
-  }),
+  })
+    .min(1)
+    .messages({
+      "object.min":
+        "At least one field is required send in query parameters sush as workingTime,jobLocation,seniorityLevel,jobTitle,technicalSkills,softSkills",
+    }),
 };
 //----------------------------------------------------------
 // schema apply job

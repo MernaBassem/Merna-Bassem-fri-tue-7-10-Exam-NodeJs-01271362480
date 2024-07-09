@@ -25,7 +25,7 @@ router.post(
   errorHandler(validationMiddleware(AddJobSchema)),
   errorHandler(jobController.addJob)
 );
-// updateJob api
+// update job api
 router.patch(
   "/updateJob/:jobId",
   errorHandler(authenticate()),
