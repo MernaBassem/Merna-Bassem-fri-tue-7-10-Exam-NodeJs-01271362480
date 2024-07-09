@@ -109,6 +109,17 @@ export const SignInSchema = {
         "any.required": "You need to provide a mobile number",
         "string.base": "mobile number must be a string",
       }),
+    recoveryEmail: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        maxDomainSegments: 4,
+        tlds: { allow: ["com", "net", "org"] },
+      })
+      .messages({
+        "string.email": "Recovery Email is not valid",
+        "string.base": "Recovery Email must be a string",
+        "any.required": "Recovery Email",
+      }),
     password: Joi.string()
       .pattern(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -121,7 +132,7 @@ export const SignInSchema = {
         "string.min": "Password should have a minimum length of 3 characters",
         "string.base": "Password must be a string",
       }),
-  }).xor("email", "mobileNumber"),
+  }).xor("email", "mobileNumber", "recoveryEmail"),
 };
 //------------------------------------------------------------------
 
@@ -282,41 +293,20 @@ export const updateUserSchema = {
 /*
   schema user get all users data have recovery email
 */
-export const recoveryEmailSchema = Joi.object({
-  params: Joi.object({
-    recoveryEmail: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        maxDomainSegments: 4,
-        tlds: { allow: ["com", "net", "org"] },
-      })
-      .messages({
-        "any.required": "Recovery Email",
-
-        "string.email": "Recovery Email is not valid",
-        "string.base": "Recovery Email must be a string",
-      }),
+export const recoveryEmailSchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
   }),
-  query: Joi.object({
-    recoveryEmail: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        maxDomainSegments: 4,
-        tlds: { allow: ["com", "net", "org"] },
-      })
-      .messages({
-        "any.required": "Recovery Email",
-
-        "string.email": "Recovery Email is not valid",
-        "string.base": "Recovery Email must be a string",
-      }),
-  }),
-}).or("params", "query"); // Use or to ensure either params or query contains userId
+}; // Use or to ensure either params or query contains userId
 
 //--------------------------------------------------------
 // forget password schema
 
-export const forgetPasswordSchema = Joi.object({
+export const forgetPasswordSchema = {
   body: Joi.object({
     email: Joi.string()
       .email({
@@ -331,12 +321,12 @@ export const forgetPasswordSchema = Joi.object({
         "string.base": "Email must be a string",
       }),
   }),
-});
+};
 //--------------------------------------------------------------
 // reset password schema
 // send email , otp , newPassword
 
-export const resetPasswordSchema = Joi.object({
+export const resetPasswordSchema = {
   body: Joi.object({
     email: Joi.string()
       .email({
@@ -368,4 +358,4 @@ export const resetPasswordSchema = Joi.object({
         "string.base": "New Password must be a string",
       }),
   }),
-});
+};

@@ -75,7 +75,8 @@ router.patch(
 //Get all accounts associated to a specific recovery Email
 //send recovery email in params or query
 router.get(
-  "/getRecoveryEmail/:recoveryEmail?",
+  "/getRecoveryEmail",
+  errorHandler(authenticate()),
   errorHandler(validationMiddleware(recoveryEmailSchema)),
   errorHandler(userController.getRecoveryEmail)
 );

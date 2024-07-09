@@ -183,16 +183,16 @@ export const confirmEmail = async (req, res, next) => {
 */
 export const signIn = async (req, res, next) => {
   // destruct data from req.body
-  const { email, password, mobileNumber } = req.body;
+  const { email, password, mobileNumber , recoveryEmail } = req.body;
 
   // Check if the user exists
-  const user = await User.findOne({ $or: [{ email }, { mobileNumber }] });
+  const user = await User.findOne({ $or: [{ email }, { mobileNumber },{recoveryEmail}] });
   if (!user) {
     return next(
       new ErrorClass(
-        "Email or Mobile Number or Password is incorrect",
+        "Email or Mobile Number or Password or  Recovery Email is incorrect",
         400,
-        { email, password, mobileNumber },
+        { email, password, mobileNumber , recoveryEmail },
         "Sign-in API"
       )
     );
@@ -213,9 +213,9 @@ export const signIn = async (req, res, next) => {
   if (!isPasswordValid) {
     return next(
       new ErrorClass(
-        "Email or Mobile Number or Password is incorrect",
+        "Email or Mobile Number or Password or  Recovery Email is incorrect",
         400,
-        { email, password, mobileNumber },
+        { email, password, mobileNumber , recoveryEmail},
         "Sign-in API"
       )
     );
@@ -763,45 +763,40 @@ export const resetPassword = async (req, res, next) => {
 */
 /*
 ** answer
-   1- send recovery email in params or query
-   2- check if users exists have same recovery email
-   3- get users data
-   4-check in data if users exists
-   5- return users data
+   1-check token send
+   2- check user online
+   3- take recovery email from rq.authUser.recoveryEmail 
+   4- get all accounts associated to a specific recovery Email 
 */
 
 export const getRecoveryEmail = async (req, res, next) => {
-  // destruct recovery email from params or query
-  const { recoveryEmail } = req.params;
-  const { recoveryEmail: queryRecoveryEmail } = req.query;
-  // check if recovery email is provided in params or query
-  if (!recoveryEmail && !queryRecoveryEmail) {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
     return next(
       new ErrorClass(
-        "Recovery Email is required",
+        "User ID is required",
         400,
-        "Send Recovery Email in params or query",
+        "Send Token in headers",
+        "get recovery email API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
         "get recovery email API"
       )
     );
   }
 
-  // Use recovery email from params if available, otherwise use from query
-  const emailToSearch = recoveryEmail || queryRecoveryEmail;
-  // check if users exists have same recovery email
-  const users = await User.find({ recoveryEmail: emailToSearch });
-  console.log(users);
-  // check if users exists
-  if (users.length === 0) {
-    return next(
-      new ErrorClass(
-        "Users not found associated to this recovery email",
-        404,
-        "Users not found associated to this recovery email",
-        "get recovery email API"
-      )
-    );
-  }
-  // return users data
-  return res.status(200).json({ count: users.length, recoveryEmail, users });
+  // take recovery email from rq.authUser.recoveryEmail
+  const { recoveryEmail } = req.authUser;
+  // get all accounts associated to a specific recovery Email
+  const accounts = await User.find({ recoveryEmail });
+  // return accounts
+  return res.status(200).json({ message: "all user found same recovery email", count: accounts.length, accounts });
 };
