@@ -6,6 +6,7 @@ import User from "../../../DB/Models/user.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
 import Company from "../../../DB/Models/company.model.js";
 import Job from "../../../DB/Models/job.model.js";
+import Application from "../../../DB/Models/application.model.js";
 /*
  * @param {object} req
  * @param {object} res
@@ -450,6 +451,8 @@ export const deleteUser = async (req, res, next) => {
   await Company.deleteMany({ companyHR: req.authUser._id });
   // delete job related to user
   await Job.deleteMany({ addedBy: req.authUser._id });
+  // delete application related to user
+  await Application.deleteMany({ userId: req.authUser._id });
   return res.status(200).json({ message: "User deleted successfully" });
 };
 //--------------------------------------------------------------------------------------------

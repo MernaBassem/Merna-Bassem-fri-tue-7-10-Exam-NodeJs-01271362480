@@ -12,6 +12,7 @@ import {
   DeleteJobSchema,
   FilterJobSchema,
   GetAllJobsAndCompanyInfo,
+  GetAllJobsForSpecificCompanySchema,
   UpdateJobSchema,
 } from "./job.schema.js";
 
@@ -47,6 +48,14 @@ router.get(
   errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
   errorHandler(validationMiddleware(GetAllJobsAndCompanyInfo)),
   errorHandler(jobController.getAllJobsAndCompanyInfo)
+);
+// get all jobs api specific company name
+router.get(
+  "/getAllJobsAndCompanyInfoSpecificCompanyName",
+  errorHandler(authenticate()),
+  errorHandler(authorizationMiddleware(roles.USER_COMPANY_HR)),
+  errorHandler(validationMiddleware(GetAllJobsForSpecificCompanySchema)),
+  errorHandler(jobController.getAllJobsForSpecificCompany)
 );
 // filter job api
 router.get(

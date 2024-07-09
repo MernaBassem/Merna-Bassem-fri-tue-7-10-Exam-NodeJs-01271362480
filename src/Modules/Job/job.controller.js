@@ -250,6 +250,8 @@ export const deleteJob = async (req, res, next) => {
 
   // delete job
   const deletedJob = await Job.findByIdAndDelete(req.params.jobId);
+  // delete application related to this job
+  await Application.deleteMany({jobId: req.params.jobId});
   // return deleted job
   return res.status(200).json({ message : "Job deleted successfully",deletedJob });
 }
@@ -292,6 +294,87 @@ export const getAllJobsAndCompanyInfo = async (req, res, next) => {
   // get all jobs with their company’s information
   const jobs = await Job.find().populate("companyId");
   // return all jobs
+  return res.status(200).json({ count: jobs.length, jobs });
+};
+
+//-------------------------------------------------------------------
+/*
+5. Get all Jobs for a specific company.
+    - apply authorization with the role ( User , Company_HR )
+    - send the company name in the query and get this company jobs.
+*/
+/*
+1- check send token
+2- check user online
+3- destructure query and get company name
+4- get all jobs for a specific company
+5- return all jobs
+*/
+
+export const getAllJobsForSpecificCompany = async (req, res, next) => {
+  // Ensure req.authUser exists
+  if (!req.authUser) {
+    return next(
+      new ErrorClass(
+        "User ID is required",
+        400,
+        "Send Token in headers",
+        "get all jobs for specific company API"
+      )
+    );
+  }
+  // Check if the user is online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get all jobs for specific company API"
+      )
+    );
+  }
+
+  // destructure query
+  const { companyName } = req.query;
+  // check if company name is provided
+  if (!companyName) {
+    return next(
+      new ErrorClass(
+        "Company name is required",
+        400,
+        "Send Company name in query",
+        "get all jobs for specific company API"
+      )
+    );
+  }
+  // find company name id
+  const company = await Company.findOne({ companyName });
+  if (!company) {
+    return next(
+      new ErrorClass(
+        "Company not found",
+        404,
+        "Company not found",
+        "get all jobs for specific company API"
+      )
+    );
+  }
+
+  // get all jobs for a specific company
+  const jobs = await Job.find({ companyId: company._id }).populate("companyId");
+  // if length job 0 
+  if (jobs.length === 0) {
+    return next(
+      new ErrorClass(
+        "No jobs found for this company",
+        404,
+        "No jobs found for this company",
+        "get all jobs for specific company API"
+      )
+    );
+  }
+  // return all jobs  
   return res.status(200).json({ count: jobs.length, jobs });
 };
 

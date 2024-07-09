@@ -278,3 +278,25 @@ export const GetAllJobsAndCompanyInfo = {
     ...generalRules.headers,
   }),
 };
+//------------------------------
+// get all jobs schema validation specific company name
+/*
+1- check token in header
+2- check company name in query
+*/
+
+export const GetAllJobsForSpecificCompanySchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  query: Joi.object({
+    companyName: Joi.string().required().messages({
+      "string.base": "companyName must be a string",
+      "any.required": "companyName is required in query",
+    }),
+  }),
+};

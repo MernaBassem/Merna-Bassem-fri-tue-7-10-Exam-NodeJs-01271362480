@@ -4,6 +4,7 @@
  */
 
 import Company from "../../../DB/Models/company.model.js";
+import Job from "../../../DB/Models/job.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
 
 /**
@@ -22,7 +23,7 @@ export const createCompany = async (req, res, next) => {
         "User ID is required",
         400,
         "Send Token in headers",
-        "update account API"
+        "update Company API"
       )
     );
   }
@@ -34,7 +35,7 @@ export const createCompany = async (req, res, next) => {
         "User must be online",
         400,
         "User must be online",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -115,7 +116,7 @@ export const updateCompany = async (req, res, next) => {
         "User ID is required",
         400,
         "Send Token in headers",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -126,7 +127,7 @@ export const updateCompany = async (req, res, next) => {
         "Company ID is required",
         400,
         "Send Company ID in params",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -137,7 +138,7 @@ export const updateCompany = async (req, res, next) => {
         "User must be online",
         400,
         "User must be online",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -150,7 +151,7 @@ export const updateCompany = async (req, res, next) => {
         "Company not found",
         404,
         "Company not found",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -162,7 +163,7 @@ export const updateCompany = async (req, res, next) => {
         "No one other than the owner is allowed to updated this company",
         403,
         "No one other than the owner is allowed to updated this company",
-        "update account API"
+        "update company API"
       )
     );
   }
@@ -239,7 +240,7 @@ export const deleteCompany = async (req, res, next) => {
         "User ID is required",
         400,
         "Send Token in headers",
-        "Delete account API"
+        "Delete Company API"
       )
     );
   }
@@ -250,7 +251,7 @@ export const deleteCompany = async (req, res, next) => {
         "Company ID is required",
         400,
         "Send Company ID in params",
-        "Delete account API"
+        "Delete Company API"
       )
     );
   } 
@@ -261,7 +262,7 @@ export const deleteCompany = async (req, res, next) => {
         "User must be online",
         400,
         "User must be online",
-        "Delete account API"
+        "Delete Company API"
       )
     );
   }
@@ -274,7 +275,7 @@ export const deleteCompany = async (req, res, next) => {
         "Company not found",
         404,
         "Company not found",
-        "Delete account API"
+        "Delete Company API"
       )
     );
   }
@@ -286,14 +287,16 @@ export const deleteCompany = async (req, res, next) => {
         "No one other than the owner is allowed to delete this company",
         403,
         "No one other than the owner is allowed to delete this company",
-        "Delete account API"
+        "Delete Company API"
       )
     );
   }
 
   // delete company
   const deleteCompany = await Company.findByIdAndDelete(req.params.id);
-  // return company
+  // delete job related to this company
+  await Job.deleteMany({ companyId: req.params.id });
+  // return company is delete
   return res
     .status(200)
     .json({ message: "Company deleted successfully", deleteCompany });
