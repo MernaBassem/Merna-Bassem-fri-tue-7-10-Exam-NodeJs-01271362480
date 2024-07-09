@@ -14,7 +14,7 @@ export const validationMiddleware = (schema) => {
 
     // Initialize validation errors array
     const validationErrors = [];
-
+    // loop through the request keys
     for (const key of reqKeys) {
       // Validate the request data against the schema of the same key
       const validationResult = schema[key]?.validate(req[key], {
@@ -26,7 +26,6 @@ export const validationMiddleware = (schema) => {
         validationErrors.push(validationResult?.error?.details);
       }
     }
-    console.log("validationResult", validationErrors);
     // If there are validation errors, return the error response  with the validation errors
     validationErrors.length
       ? next(new ErrorClass("Validation Error", 400, validationErrors))

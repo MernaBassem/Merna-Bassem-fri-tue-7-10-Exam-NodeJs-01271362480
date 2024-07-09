@@ -1,11 +1,14 @@
+
 import Joi from "joi";
 import { Types } from "mongoose";
 
+// validate ObjectId 
 export const objectIdValidation = (value, helper) => {
   const isValid = Types.ObjectId.isValid(value);
   return isValid ? value : helper.message("Invalid ObjectId");
 };
 
+// general rules use in validation
 export const generalRules = {
   objectId: Joi.string().custom(objectIdValidation),
   headers: {

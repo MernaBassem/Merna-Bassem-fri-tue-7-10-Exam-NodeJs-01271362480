@@ -1,13 +1,15 @@
 import Joi from "joi";
+
 import { systemRoles } from "../../utils/system-roles.utils.js";
 import {
   generalRules,
   objectIdValidation,
 } from "../../utils/general-rules.utils.js";
 
-/* user schema validation all input before the arrive to api sign_up user
+/* user schema validation all input before the arrive to api signUp user
   the validation only data in body
 */
+
 export const SignUpSchema = {
   body: Joi.object({
     firstName: Joi.string().min(3).max(15).required().messages({
@@ -68,7 +70,7 @@ export const SignUpSchema = {
       .pattern(/^(\+20|0)?1[0125]\d{8}$/)
       .required()
       .messages({
-        "string.pattern.base": "Mobile Number is Valid",
+        "string.pattern.base": "Mobile Number is Not Valid",
         "any.required": "You need to provide a mobile number",
         "string.base": "mobile number must be a string",
       }),
@@ -84,9 +86,10 @@ export const SignUpSchema = {
     }),
   }),
 };
+
 //------------------------------------------------------
 
-/* user schema validation all input before the arrive to api sign-in user
+/* user schema validation all input before the arrive to api signIn user
   the validation only data in body
 */
 export const SignInSchema = {
@@ -155,6 +158,7 @@ export const generalSchemaCheckOnlyToken = {
 /*
   schema user profile through send id user in query or params
 */
+
 export const profileSchema = Joi.object({
   params: Joi.object({
     userId: Joi.string()
@@ -214,11 +218,12 @@ export const updatePasswordSchema = {
 };
 
 //----------------------------------------------------------------------------------------
-/**
+
+
+/*
  * schema update user
  * check validation of the new user data from body
  * check token in header
- *
  */
 
 export const updateUserSchema = {
@@ -246,9 +251,7 @@ export const updateUserSchema = {
         "any.required": "Email is required",
         "string.base": "Email must be a string",
       }),
-    password: Joi.forbidden().messages({
-      "any.unknown": "User PAssword is not allowed to be updated",
-    }),
+
     recoveryEmail: Joi.string()
       .email({
         minDomainSegments: 2,
@@ -273,8 +276,11 @@ export const updateUserSchema = {
         "any.required": "You need to provide a mobile number",
         "string.base": "mobile number must be a string",
       }),
+    password: Joi.forbidden().messages({
+      "any.unknown": "User Password is not allowed to be updated",
+    }),
     role: Joi.forbidden().messages({
-      "any.unknown": "User PAssword is not allowed to be updated",
+      "any.unknown": "User Role is not allowed to be updated",
     }),
     status: Joi.string().valid("online", "offline").messages({
       "any.only": "Status must be either online or offline",
@@ -288,20 +294,8 @@ export const updateUserSchema = {
     ...generalRules.headers,
   }),
 };
-//----------------------------------------------------------------------------
 
-/*
-  schema user get all users data have recovery email
-*/
-export const recoveryEmailSchema = {
-  headers: Joi.object({
-    token: Joi.string().required().messages({
-      "string.base": "Token must be a string",
-      "any.required": "Token is required",
-    }),
-    ...generalRules.headers,
-  }),
-}; // Use or to ensure either params or query contains userId
+
 
 //--------------------------------------------------------
 // forget password schema
@@ -359,3 +353,4 @@ export const resetPasswordSchema = {
       }),
   }),
 };
+

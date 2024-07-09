@@ -3,7 +3,6 @@ import { ErrorClass } from "../utils/error-class.utils.js";
 export const errorHandler = (API) => {
   return (req, res, next) => {
     Promise.resolve(API(req, res, next)).catch((err) => {
-      console.log("Error in async handler scope", err);
       next(new ErrorClass("Internal Server error", 500, err.message));
     });
   };
@@ -11,7 +10,6 @@ export const errorHandler = (API) => {
 
 export const globaleResponse = (err, req, res, next) => {
   if (err) {
-    console.log(err);
     res.status(err.status || 500).json({
       message: "Fail response",
       err_msg: err.message,

@@ -1,3 +1,4 @@
+// system roles (user and company_HR)
 export const systemRoles = {
   USER: "user",
   COMPANY_HR: "company_HR",
@@ -5,7 +6,7 @@ export const systemRoles = {
 };
 
 const { USER, COMPANY_HR} = systemRoles;
-
+// Cases of roles
 export const roles = {
   USER_COMPANY_HR: [USER, COMPANY_HR],
   USER:[USER],

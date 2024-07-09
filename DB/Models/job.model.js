@@ -11,9 +11,9 @@
 */
 
 import mongoose from "mongoose";
+
 const { Schema, model } = mongoose;
 
-import Application  from './application.model.js';  // Import Application model
 
 const jobSchema = new mongoose.Schema(
   {
@@ -59,11 +59,11 @@ const jobSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true, versionKey: "version_key" }
+  {
+    timestamps: true,
+    versionKey: "version_key",
+  }
 );
-
-
-
 
 const Job = mongoose.models.Job || model("Job", jobSchema);
 export default Job;

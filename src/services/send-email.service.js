@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
  * @description - Send email service
  */
 
+// sendEmail service ( transporter and mail )
 export const sendEmailService = async ({
   to,
   subject = "No Reply",
@@ -19,13 +20,13 @@ export const sendEmailService = async ({
     port: 465,
     secure: true, 
     auth: {
-      user: "mernabassem21@gmail.com", 
-      pass: "yajvbppxnvvpitbe", 
+      user: "mernabassem21@gmail.com", // email will send from
+      pass: "yajvbppxnvvpitbe",  // password email (app password)
     },
   });
   // configer message ( mail )
   const info = await transporter.sendMail({
-    from: "No Retry <mernabassem21@gmail.com>",
+    from: "No Reply <mernabassem21@gmail.com>",
     to,
     subject,
     text: textMessage,

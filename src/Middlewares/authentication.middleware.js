@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
-import User from "../../DB/Models/user.model.js";
+
 import { ErrorClass } from "../utils/error-class.utils.js";
+
+import User from "../../DB/Models/user.model.js";
 
 /**
  * @returns {function} return middleware function

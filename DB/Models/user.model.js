@@ -13,9 +13,8 @@
 */
 
 import mongoose from "mongoose";
+
 import { systemRoles } from "../../src/utils/system-roles.utils.js";
-import Company from "./company.model.js";
-import Application from "./application.model.js"; // Import Application model
 
 const { Schema, model } = mongoose;
 
@@ -25,14 +24,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
       minLength: 3,
     },
     lastName: {
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
       minLength: 3,
     },
     username: {
@@ -77,10 +74,19 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    otp: { type: String, default: null },
-    otpExpiry: { type: Date, default: null },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+    },
   },
-  { timestamps: true, versionKey: "version_key" }
+  {
+    timestamps: true,
+    versionKey: "version_key",
+  }
 );
 
 // The username value is the combination of the value of the first name and the second name

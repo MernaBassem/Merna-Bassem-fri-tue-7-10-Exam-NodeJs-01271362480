@@ -2,21 +2,30 @@ import { compareSync, hashSync } from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { sendEmailService } from "../../services/send-email.service.js";
-import User from "../../../DB/Models/user.model.js";
 import { ErrorClass } from "../../utils/error-class.utils.js";
+
+import User from "../../../DB/Models/user.model.js";
 import Company from "../../../DB/Models/company.model.js";
 import Job from "../../../DB/Models/job.model.js";
 import Application from "../../../DB/Models/application.model.js";
-/*
- * @param {object} req
- * @param {object} res
- * @param {object} next
- * @body -- user data in signup
- * @returns {object} return response { message, user }
- * @description create new user
- */
 
 // signUp User
+
+/*
+ * answer:
+  after validation
+  1- destruct data from req.body
+  2- Check if the email already exists
+  3- check if the phone already exists
+  4- take new instance
+  5- hash password
+  6- generate token
+  7- confirmation Link
+  8- send email
+  9- save user
+  10- return response user added successfully and user data
+ */
+
 export const signUp = async (req, res, next) => {
   // destruct data from req.body
   const {
@@ -34,7 +43,7 @@ export const signUp = async (req, res, next) => {
   const isEmailExists = await User.findOne({ email });
   if (isEmailExists) {
     return next(
-      new ErrorClass("Email already exists", 400, email, "sign-up api")
+      new ErrorClass("Email already exists", 400, email, "SignUp api")
     );
   }
   // check if the phone already exists
@@ -55,12 +64,13 @@ export const signUp = async (req, res, next) => {
     firstName,
     lastName,
     email,
-    password: hashSync(password, +process.env.SALT_ROUNDS), // hash password
+    password: hashSync(password, +process.env.SALT_ROUNDS), // hash password (+) convert string to number
     recoveryEmail,
     DOB,
     mobileNumber,
     role,
   });
+
   // generate token
   const token = jwt.sign(
     { _id: userInstance._id },
@@ -74,14 +84,20 @@ export const signUp = async (req, res, next) => {
   // send email
   const isEmailSent = await sendEmailService({
     to: email,
-    subject: "Welcome to our app",
-    textMessage: "Hello, welcome to our app",
-    htmlMessage: `<a href="${confirmationLink}">Click here to confirm your email</a>`,
+    subject: "Active Email",
+    textMessage: "Active Email",
+    htmlMessage: `<a href="${confirmationLink}">Click here to confirm your email To Active Email</a>`,
   });
-
+  // check if email sent
   if (isEmailSent.rejected.length) {
     return next(
-      new ErrorClass("Email Not Sent", 400, "Email Not Sent", email, "signUp ")
+      new ErrorClass(
+        "Email Not Sent",
+        400,
+        "Email Not Sent",
+        email,
+        "signUp api"
+      )
     );
   }
   // Create a new user
@@ -91,13 +107,24 @@ export const signUp = async (req, res, next) => {
   res.status(201).json({ message: "Successfully registered", user });
 };
 
-// //-----------------------------------------
+// `-------------------------------------------------------------------------
 
 /**
- * @param {token} req
- *  @returns {object} return response { message}
- * @description confirm email from link send to mail
- * if token expired generate new token
+* answer:
+1- take token from params
+try : 
+2- decode token
+3- find user by id
+4- update user isConfirmed to true
+5- return response
+catch : 
+1- if token expired
+2- decode token
+3- create new token 
+4- create new conformation
+5- send new email
+6- check email send
+7- if email send return response email send else return response error
  */
 
 export const confirmEmail = async (req, res, next) => {
@@ -153,6 +180,7 @@ export const confirmEmail = async (req, res, next) => {
               "Email confirmation link expired. A new confirmation link has been sent to your email.",
           });
         } catch (emailErr) {
+          // if error in send new conformation
           return next(
             new ErrorClass(
               "Failed to send new confirmation email",
@@ -175,35 +203,41 @@ export const confirmEmail = async (req, res, next) => {
 // 2-signIn User
 
 /*
-  send user data if login in body
-  check user found email or mobile number and password
-  check user active email
-  update status user from offline to online
-  if user found return token 
+ * answer:
+ * after validation
+  1- send user data if login in body
+  2- check user found email or mobile number or recovery email and password
+  3- check user active email
+  4- create token
+  5- update status user from offline to online
+  6- if user found return token 
 */
 export const signIn = async (req, res, next) => {
   // destruct data from req.body
-  const { email, password, mobileNumber , recoveryEmail } = req.body;
+  const { email, password, mobileNumber, recoveryEmail } = req.body;
 
   // Check if the user exists
-  const user = await User.findOne({ $or: [{ email }, { mobileNumber },{recoveryEmail}] });
+  const user = await User.findOne({
+    $or: [{ email }, { mobileNumber }, { recoveryEmail }],
+  });
   if (!user) {
     return next(
       new ErrorClass(
         "Email or Mobile Number or Password or  Recovery Email is incorrect",
         400,
-        { email, password, mobileNumber , recoveryEmail },
-        "Sign-in API"
+        { email, password, mobileNumber, recoveryEmail },
+        "SignIn API"
       )
     );
   }
+  // check email is active by comfirm email
   if (user.isConfirmed === false) {
     return next(
       new ErrorClass(
         "Please Frist Active Your Email ",
         400,
         user.email,
-        "Sign-in API"
+        "SignIn API"
       )
     );
   }
@@ -215,8 +249,8 @@ export const signIn = async (req, res, next) => {
       new ErrorClass(
         "Email or Mobile Number or Password or  Recovery Email is incorrect",
         400,
-        { email, password, mobileNumber , recoveryEmail},
-        "Sign-in API"
+        { email, password, mobileNumber, recoveryEmail },
+        "SignIn API"
       )
     );
   }
@@ -238,27 +272,27 @@ export const signIn = async (req, res, next) => {
 
 // logout user
 /**
- *
- * - user must be logged in
- * - user data send in token in header
- * - update the status of the user to "offline"
- * - return "Logout Successful"
+ * answer:
+ * after authentication and validation
+ * 1- user must be logged in
+ * 2- user must be online
+ * 3- user data send in token in header
+ * 4- update the status of the user to "offline"
+ * 5- return "Logout Successful"
  *
  */
 export const logOut = async (req, res, next) => {
-  // Ensure req.userId exists
-
-  if (!req.authUser) {
+  // check user is online
+  if (req.authUser.status !== "online") {
     return next(
       new ErrorClass(
-        "User ID is required",
+        "User must be online",
         400,
-        "Send Token in headers",
-        "log-out API"
+        "User must be online",
+        "logout API"
       )
     );
   }
-
   // Update the  status of the user to "offline"
   const updatedUser = await User.findByIdAndUpdate(
     req.authUser._id,
@@ -276,40 +310,23 @@ export const logOut = async (req, res, next) => {
 };
 
 //-----------------------------------------------------------------------------------------------
-/**
- * question:
- * 3. Update account.
- *    - You can update (email, mobileNumber, recoveryEmail, DOB, lastName, firstName)
- *    - If the user updates the email or mobile number, make sure that the new data doesn’t conflict with any existing data in your database
- *    - User must be logged in
- *    - Only the owner of the account can update his account data
- */
+
+// Update account.
 
 /**
  * answer:
- * Steps:
- * 1. Send token in header to authenticate
+ * after authentication
+ * 1. check user online
  * 2. Destructure firstName, lastName, email, mobileNumber, recoveryEmail, DOB from the body
- * 3. Check email and mobile number uniqueness in all data
- * 4. If the email is updated, send a verification email
+ * 3. if update email or mobile number, Check email and mobile number uniqueness in all data
+ * 4. If the email is updated, create new token and send verification email to active email
  * 5. If the email is updated, set isConfirmed to false and status to offline, then prompt the user to log in again
  * 6. Save the updated data
  * 7. Do not update password or role
+ * 8. return updated data
  */
 
 export const updateAccount = async (req, res, next) => {
-  // Ensure req.authUser exists
-  if (!req.authUser) {
-    return next(
-      new ErrorClass(
-        "User ID is required",
-        400,
-        "Send Token in headers",
-        "update account API"
-      )
-    );
-  }
-
   // Check if the user is online
   if (req.authUser.status !== "online") {
     return next(
@@ -330,7 +347,6 @@ export const updateAccount = async (req, res, next) => {
   const existingUser = await User.findOne({
     $or: [{ email }, { mobileNumber }],
   });
-  console.log("existingUser", existingUser);
   // If an existing user with the same email or mobile number is found, return an error
   if (existingUser) {
     return next(
@@ -354,7 +370,6 @@ export const updateAccount = async (req, res, next) => {
       },
       { new: true }
     );
-
     // Generate token
     const token = jwt.sign(
       { _id: userInstance._id },
@@ -387,48 +402,45 @@ export const updateAccount = async (req, res, next) => {
     }
   }
 
-  // Update the user data
-  const updatedUser = await User.findByIdAndUpdate(
-    req.authUser._id,
-    {
-      firstName,
-      lastName,
-      email,
-      mobileNumber,
-      recoveryEmail,
-      DOB,
-      username: `${firstName || req.authUser.firstName}${
-        lastName || req.authUser.lastName
-      }`,
-    },
-    { new: true }
-  );
+  //  new variable contain user data
+  const user = req.authUser;
+  // check data is send or not (such new instance)
+  if (firstName) user.firstName = firstName;
+  if (lastName) user.lastName = lastName;
+  if (email) user.email = email;
+  if (mobileNumber) user.mobileNumber = mobileNumber;
+  if (recoveryEmail) user.recoveryEmail = recoveryEmail;
+  if (DOB) user.DOB = DOB;
+  // change username if find firstName and lastName
+  if (firstName || lastName) {
+    user.username = `${firstName || req.authUser.firstName}${
+      lastName || req.authUser.lastName
+    }`;
+  }
 
+  // Save the updated user data
+  const updatedUser = await user.save();
   // Return success response
   return res.status(200).json({ message: "Update Successful", updatedUser });
 };
 
 //------------------------------------------------------------------------------------------------
+
+// delete account
+
 /**
- *  4- delete user 
- * - only the owner of the account can delete his account data
-   - User must be loggedIn
-   user data send in token in header
-   
+ * answer:
+ * after authentication and validation
+ *  1- check user online
+ *  2- delete user
+ *  3- if deleted return response deleted else return error
+ *  4- delete company related to user
+ *  5- delete job related to user
+ *  6- delete application related to user
+ *  7- return deleted user
  */
 
 export const deleteUser = async (req, res, next) => {
-  // Ensure req.userId exists
-  if (!req.authUser) {
-    return next(
-      new ErrorClass(
-        "User ID is required",
-        400,
-        "Send Token in headers",
-        "delete user API"
-      )
-    );
-  }
   // check status online
   if (req.authUser.status !== "online") {
     return next(
@@ -453,26 +465,26 @@ export const deleteUser = async (req, res, next) => {
   await Job.deleteMany({ addedBy: req.authUser._id });
   // delete application related to user
   await Application.deleteMany({ userId: req.authUser._id });
-  return res.status(200).json({ message: "User deleted successfully" });
+  // return deleted user
+  return res
+    .status(200)
+    .json({ message: "User deleted successfully", deletedUser });
 };
+
 //--------------------------------------------------------------------------------------------
-// 5. Get user account data
-//     - only the owner of the account can get his account data
-//     - User must be loggedIn
+
+// Get user account data
+
+/*
+answer:
+after authentication and validation
+1. check user online
+2. get user data only owner the take id from req.authUser
+3. check user found
+4. return user data
+*/
 
 export const getAccountData = async (req, res, next) => {
-  // Ensure req.userId exists
-  if (!req.authUser) {
-    return next(
-      new ErrorClass(
-        "User ID is required",
-        400,
-        "Send Token in headers",
-        "get account data API"
-      )
-    );
-  }
-
   // check status online
   if (req.authUser.status !== "online") {
     return next(
@@ -493,17 +505,34 @@ export const getAccountData = async (req, res, next) => {
   }
   return res.status(200).json({ userData });
 };
-//-----------------------------------------------------------
-// 6. Get profile data for another user
-// - send the userId in params or query
-/**
-    send userId in params or query
-    - check if user exists
-    - get user data
-    - return user data
 
+//-----------------------------------------------------------
+
+// Get profile data for another user send the userId in params or query
+
+/**
+ * answer:
+ * after authentication and validation
+ * 1. check user online
+ * 2. destruct userId from params or query
+ * 3- check userId is provided in params or query
+ * 4- check if user exists
+ * 5- get user data
+ * 6- return user data
  */
+
 export const getProfileData = async (req, res, next) => {
+  // check status online
+  if (req.authUser.status !== "online") {
+    return next(
+      new ErrorClass(
+        "User must be online",
+        400,
+        "User must be online",
+        "get profile data API"
+      )
+    );
+  }
   // Destruct userId from params or query
   const { userId } = req.params;
   const { userId: queryUserId } = req.query;
@@ -534,32 +563,24 @@ export const getProfileData = async (req, res, next) => {
   // Return user data
   return res.status(200).json({ userData });
 };
+
 //-----------------------------------------------------------------------------
-// 7-Update password for user login
-/**  only the owner of the account can update his password
-  User must be loggedIn
-  user data send in token in header
-  check status online
-  destruct old password and new password from body
-  if old password not match return error compare password
-  else hash new password
-  update password
-  return message "Password updated successfully"
+
+// Update password
+
+/*
+answer:
+after authentication and validation
+1- check user online
+2- destruct old password and new password from body
+3- compare password with old password
+4- if compare false return error
+5- if compare true hash new password
+6- update password and status to offline try login by new password
+7- return updated password
 */
 
 export const updatePassword = async (req, res, next) => {
-  // Ensure req.userId exists
-  if (!req.authUser) {
-    return next(
-      new ErrorClass(
-        "User ID is required",
-        400,
-        "Send Token in headers",
-        "update password API"
-      )
-    );
-  }
-
   // check status online
   if (req.authUser.status !== "online") {
     return next(
@@ -587,13 +608,16 @@ export const updatePassword = async (req, res, next) => {
       )
     );
   }
-  // hash new password
 
+  // hash new password
   const hashedPassword = hashSync(newPassword, +process.env.SALT_ROUNDS);
   // update password
   const updatedPassword = await User.findByIdAndUpdate(
     req.authUser._id,
-    { password: hashedPassword },
+    {
+      password: hashedPassword,
+      status: "offline",
+    },
     { new: true }
   );
   // check if password updated
@@ -607,25 +631,27 @@ export const updatePassword = async (req, res, next) => {
       )
     );
   }
-
-  return res
-    .status(200)
-    .json({ message: "Password updated successfully", updatedPassword });
+  // return updated password
+  return res.status(200).json({
+    message:
+      "Password updated successfully , please login agin by new password",
+    updatedPassword,
+  });
 };
+
 //----------------------------------------------------------------------
 
-//Forget password (make sure of your data security specially the OTP and the newPassword )
+//Forget password
 
-/**
-/forgot-password Route:
-
-Find User: Find the user by email. If the user does not exist, return a 404 error.
-Generate OTP: Generate a 6-character OTP using crypto.randomBytes.
-Save OTP and Expiry: Save the OTP and its expiration time to the user's record.
-Send OTP via Email: Use nodemailer to send the OTP to the user's email.
-
-
-
+/*
+answer:
+1- destruct email from body
+2- find user by email
+3- if user not found return error
+4- generate otp
+5- save otp and expiry in database
+6- send otp via email
+7- return response
 */
 
 export const forgetPassword = async (req, res, next) => {
@@ -658,10 +684,12 @@ export const forgetPassword = async (req, res, next) => {
 
   // generate otp
   const otp = Math.floor(100000 + Math.random() * 900000);
+  // set expire time of otp
+  const otpExpiry = Date.now() + 3600000;
   // save otp and expiry in DataBase
   const updateUser = await User.findByIdAndUpdate(
     user._id,
-    { otp, otpExpiry: Date.now() + 3600000 },
+    { otp, otpExpiry },
     { new: true }
   );
 
@@ -672,6 +700,7 @@ export const forgetPassword = async (req, res, next) => {
     textMessage: "Your OTP",
     htmlMessage: `<h1>${otp}</h1>`,
   });
+
   // check isEmailSent
   if (!isEmailSent) {
     return next(
@@ -688,17 +717,28 @@ export const forgetPassword = async (req, res, next) => {
     .status(200)
     .json({ message: "OTP sent successfully", isEmailSent });
 };
-//--------------------------------------
-/**
- * /reset-password Route:
 
-  Find User: Find the user by email. If the user does not exist, return a 404 error.
-  Verify OTP: Check if the provided OTP matches the one saved in the database and if it has not expired. If invalid, return a 400 error.
-  Reset Password: Update the user's password, clear the OTP and its expiration time, and save the user record.
- */
+//-----------------------------------------------------------------------
+
+// reset password
+
+/*
+answer:
+1- destruct email, otp and newPassword from body
+2- check if email, otp and newPassword are provided
+3- find user by email
+4- if user not found return error
+5- check if otp and otpExpiry are valid
+6- if invalid return error
+7- hash newPassword
+7- update password after hash and clear otp and otpExpiry in database
+8- return response
+*/
 
 export const resetPassword = async (req, res, next) => {
+  // destruct email, otp and newPassword from body
   const { email, otp, newPassword } = req.body;
+
   // check if email and otp are provided
   if (!email || !otp || !newPassword) {
     return next(
@@ -710,8 +750,10 @@ export const resetPassword = async (req, res, next) => {
       )
     );
   }
+
   // find user by email
   const user = await User.findOne({ email });
+
   // check if user exists
   if (!user) {
     return next(
@@ -723,64 +765,61 @@ export const resetPassword = async (req, res, next) => {
       )
     );
   }
+
   // check otp valid
   if (user.otp !== otp) {
     return next(
       new ErrorClass("Invalid OTP", 400, "Invalid OTP", "reset password API")
     );
   }
+
   // check otp expired
-  console.log(user.otpExpiry);
   if (Date.now() > user.otpExpiry) {
     return next(
       new ErrorClass("expired OTP", 400, "Invalid OTP", "reset password API")
     );
   }
-  // update password
+
+  // hash password
   const hashedPassword = hashSync(newPassword, +process.env.SALT_ROUNDS);
+
+  // update password
   const updateUser = await User.findByIdAndUpdate(
     user._id,
     { password: hashedPassword },
     { new: true }
   );
+
   // clear otp and otpExpiry
   const clearOTP = await User.findByIdAndUpdate(
     user._id,
     { otp: null, otpExpiry: null, status: "offline" },
     { new: true }
   );
+
   // return success reset password
   return res.status(200).json({
     message: "Password reset successfully try login use new password",
   });
 };
 
+
 //-----------------------------------------------------------------------
-/*
- ** question
- Get all accounts associated to a specific recovery Email 
- send recovery email in params or query
-*/
+
+// Get all accounts associated to a specific recovery Email 
+
 /*
 ** answer
-   1-check token send
-   2- check user online
-   3- take recovery email from rq.authUser.recoveryEmail 
-   4- get all accounts associated to a specific recovery Email 
+   after authenticate and validation
+
+   1- check user online
+   2- destruct recovery email from rq.authUser
+   3- get all accounts associated to a specific recovery Email
+   4- return accounts 
 */
 
 export const getRecoveryEmail = async (req, res, next) => {
-  // Ensure req.authUser exists
-  if (!req.authUser) {
-    return next(
-      new ErrorClass(
-        "User ID is required",
-        400,
-        "Send Token in headers",
-        "get recovery email API"
-      )
-    );
-  }
+
   // Check if the user is online
   if (req.authUser.status !== "online") {
     return next(
@@ -798,5 +837,9 @@ export const getRecoveryEmail = async (req, res, next) => {
   // get all accounts associated to a specific recovery Email
   const accounts = await User.find({ recoveryEmail });
   // return accounts
-  return res.status(200).json({ message: "all user found same recovery email", count: accounts.length, accounts });
+  return res.status(200).json({
+    message: "all user found same recovery email",
+    count: accounts.length,
+    accounts,
+  });
 };

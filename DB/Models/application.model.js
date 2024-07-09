@@ -31,7 +31,10 @@ const applicationSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true, versionKey: "version_key" }
+  {
+    timestamps: true,
+    versionKey: "version_key",
+  }
 );
 
 const Application =
