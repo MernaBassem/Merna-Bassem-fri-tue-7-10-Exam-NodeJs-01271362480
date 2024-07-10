@@ -4,6 +4,7 @@ import {
   generalRules,
   objectIdValidation,
 } from "../../utils/general-rules.utils.js";
+
 // add job
 
 export const AddJobSchema = {
@@ -92,6 +93,7 @@ export const AddJobSchema = {
 //-------------------------------------------------------------------
 
 // Update job schema
+
 export const UpdateJobSchema = {
   params: Joi.object({
     jobId: Joi.string()
@@ -166,11 +168,13 @@ export const UpdateJobSchema = {
 };
 
 //----------------------------------
+
 // delete job schema validation
 /**
  * 1- check token in header
  * 2- check id in params
  */
+
 export const DeleteJobSchema = {
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -190,13 +194,15 @@ export const DeleteJobSchema = {
       }),
   }),
 };
+
 //------------------------------------------------
 
 // filter job schema validation
-/**
+/*
  * 1- check token in header
  * 2- allow user to filter with workingTime , jobLocation , seniorityLevel and jobTitle,technicalSkills
  */
+
 export const FilterJobSchema = {
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -246,12 +252,56 @@ export const FilterJobSchema = {
         "At least one field is required send in query parameters sush as workingTime,jobLocation,seniorityLevel,jobTitle,technicalSkills,softSkills",
     }),
 };
+
+
+//-----------------------
+
+//get all jobs schema validation
+/**
+ * 1- check token in header
+ */
+export const GetAllJobsAndCompanyInfo = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+};
+
+//------------------------------
+
+// get all jobs schema validation specific company name
+/*
+1- check token in header
+2- check company name in query
+*/
+
+export const GetAllJobsForSpecificCompanySchema = {
+  headers: Joi.object({
+    token: Joi.string().required().messages({
+      "string.base": "Token must be a string",
+      "any.required": "Token is required",
+    }),
+    ...generalRules.headers,
+  }),
+  query: Joi.object({
+    companyName: Joi.string().required().messages({
+      "string.base": "companyName must be a string",
+      "any.required": "companyName is required in query",
+    }),
+  }),
+};
+
 //----------------------------------------------------------
+
 // schema apply job
 /**
  * 1- check token in header
  * 2- check id in body { jobId, userTechSkills, userSoftSkills }
  */
+
 export const ApplyJobSchema = {
   headers: Joi.object({
     token: Joi.string().required().messages({
@@ -277,43 +327,6 @@ export const ApplyJobSchema = {
       "array.base": "userSoftSkills must be an array",
       "array.includes": "userSoftSkills must be an array of strings",
       "any.required": "userSoftSkills is required in body",
-    }),
-  }),
-};
-
-//-----------------------
-//get all jobs schema validation
-/**
- * 1- check token in header
- */
-export const GetAllJobsAndCompanyInfo = {
-  headers: Joi.object({
-    token: Joi.string().required().messages({
-      "string.base": "Token must be a string",
-      "any.required": "Token is required",
-    }),
-    ...generalRules.headers,
-  }),
-};
-//------------------------------
-// get all jobs schema validation specific company name
-/*
-1- check token in header
-2- check company name in query
-*/
-
-export const GetAllJobsForSpecificCompanySchema = {
-  headers: Joi.object({
-    token: Joi.string().required().messages({
-      "string.base": "Token must be a string",
-      "any.required": "Token is required",
-    }),
-    ...generalRules.headers,
-  }),
-  query: Joi.object({
-    companyName: Joi.string().required().messages({
-      "string.base": "companyName must be a string",
-      "any.required": "companyName is required in query",
     }),
   }),
 };

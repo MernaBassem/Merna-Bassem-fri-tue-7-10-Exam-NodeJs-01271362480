@@ -1,10 +1,11 @@
 import { Router } from "express";
 
 import * as jobController from "./job.controller.js";
+
+import { roles } from "../../utils/system-roles.utils.js";
 import { errorHandler } from "../../Middlewares/error-handling.middleware.js";
 import { authenticate } from "../../Middlewares/authentication.middleware.js";
 import { authorizationMiddleware } from "../../Middlewares/authorization.middleware.js";
-import { roles } from "../../utils/system-roles.utils.js";
 import { validationMiddleware } from "../../Middlewares/validation.middleware.js";
 import {
   AddJobSchema,
@@ -17,6 +18,7 @@ import {
 } from "./job.schema.js";
 
 const router = Router();
+
 // addJob api
 router.post(
   "/addJob",
@@ -25,14 +27,16 @@ router.post(
   errorHandler(validationMiddleware(AddJobSchema)),
   errorHandler(jobController.addJob)
 );
+
 // update job api
-router.patch(
+router.put(
   "/updateJob/:jobId",
   errorHandler(authenticate()),
   errorHandler(authorizationMiddleware(roles.COMPANY_HR)),
   errorHandler(validationMiddleware(UpdateJobSchema)),
   errorHandler(jobController.updateJob)
 );
+
 // delete job api
 router.delete(
   "/deleteJob/:jobId",
@@ -41,6 +45,7 @@ router.delete(
   errorHandler(validationMiddleware(DeleteJobSchema)),
   errorHandler(jobController.deleteJob)
 );
+
 // get all jobs api
 router.get(
   "/getAllJobsAndCompanyInfo",
@@ -49,6 +54,7 @@ router.get(
   errorHandler(validationMiddleware(GetAllJobsAndCompanyInfo)),
   errorHandler(jobController.getAllJobsAndCompanyInfo)
 );
+
 // get all jobs api specific company name
 router.get(
   "/getAllJobsAndCompanyInfoSpecificCompanyName",
@@ -57,6 +63,7 @@ router.get(
   errorHandler(validationMiddleware(GetAllJobsForSpecificCompanySchema)),
   errorHandler(jobController.getAllJobsForSpecificCompany)
 );
+
 // filter job api
 router.get(
   "/filterJob",
@@ -65,6 +72,7 @@ router.get(
   errorHandler(validationMiddleware(FilterJobSchema)),
   errorHandler(jobController.filterJobs)
 );
+
 // apply job api
 router.post(
   "/applyJob",
