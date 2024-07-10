@@ -1,0 +1,781 @@
+{
+	"info": {
+		"_postman_id": "98386e5c-2adb-4a19-80ed-f80d2bf992b7",
+		"name": "Job_App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32953180"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "SignUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Merna\",\r\n    \"lastName\":\"Bassem\",\r\n    \"email\":\"xiwocav962@furnato.com\",\r\n    \"password\":\"Merna21@\",\r\n    \"mobileNumber\":\"0120456637\",\r\n    \"recoveryEmail\":\"mernabassem21@gmail.com\",\r\n    \"role\":\"company_HR\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/signUp",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"signUp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"email\":\"cixerot660@cartep.com\",\r\n    \"password\":\"Merna@2112002\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/signIn",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"signIn"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logOut",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhhZTVmMTVjN2JmMDVkZmE5ZGY4MzIiLCJpYXQiOjE3MjAzODQ0ODUsImV4cCI6MTcyMDM4ODA4NX0.apb6diI70oYzx-4oUcekxF7lUpytbGWx-nNpWyUeGgU",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/log-out",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"log-out"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletedAccount",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkNzZiZjE2YTFmYTVhNGIyYzMyZjgiLCJpYXQiOjE3MjA1NjEyNTAsImV4cCI6MTcyMDU2NDg1MH0.ULDiihuBGkZYDFTQxao2vsIdQOsSR9m99kagY-PtY0w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/deleteAccount",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"deleteAccount"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAccountData",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjE1NDEsImV4cCI6MTcyMDU2NTE0MX0.5IMo5-fJV3mEkMoRGcuDqEuwmPXz_tw_IKjstmOiiJw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/getAccountData",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"getAccountData"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProfileData",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjE1NDEsImV4cCI6MTcyMDU2NTE0MX0.5IMo5-fJV3mEkMoRGcuDqEuwmPXz_tw_IKjstmOiiJw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/getProfileData/668d6d4cb18ceed0c45d0164",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"getProfileData",
+								"668d6d4cb18ceed0c45d0164"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "668b004a788ecbe22803ee48",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updatePassword",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjE1NDEsImV4cCI6MTcyMDU2NTE0MX0.5IMo5-fJV3mEkMoRGcuDqEuwmPXz_tw_IKjstmOiiJw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oldPassword\":\"Merna21@\",\r\n    \"newPassword\":\"Merna@2112002\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/updatePassword",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"updatePassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjE1NDEsImV4cCI6MTcyMDU2NTE0MX0.5IMo5-fJV3mEkMoRGcuDqEuwmPXz_tw_IKjstmOiiJw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"password\":\"Merna@21\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/updateAccount",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"updateAccount"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSpesificUserRecoveryEmail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjQwMDMsImV4cCI6MTcyMDU2NzYwM30.3vfRMdjrEucRLweVSAZYhN4sdah1UsG8C-3kkwFWOu0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/getRecoveryEmail",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"getRecoveryEmail"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"toyera7505@furnato.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/forgetPassword",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"forgetPassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"toyera7505@furnato.com\",\r\n    \"otp\":\"244180\",\r\n    \"newPassword\":\"Merna21@\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/resetPassword",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"resetPassword"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Company",
+			"item": [
+				{
+					"name": "createCompany",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjQwMDMsImV4cCI6MTcyMDU2NzYwM30.3vfRMdjrEucRLweVSAZYhN4sdah1UsG8C-3kkwFWOu0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"companyName\" :\"ODE\",\r\n    \"description\" : \"company work digital marking\",\r\n    \"industry\" : \"company\",\r\n    \"address\" : \"city stars\",\r\n    \"numberOfEmployees\":\"2-90\",\r\n    \"companyEmail\" : \"ode.company@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/company/createCompany",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"createCompany"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCompany",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhjMmYxOTVmNTcwMDIxYTM4ZjFlZmIiLCJpYXQiOjE3MjA0NjQzMTcsImV4cCI6MTcyMDQ2NzkxN30.yTddRT4OBy_8EGJ1h93-svmXz2ddg3miIEIci41TeqA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"numberOfEmployees\":\"10-100\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/company/updateCompany/668c323d879ac390b252d40e",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"updateCompany",
+								"668c323d879ac390b252d40e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCompany",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjQwMDMsImV4cCI6MTcyMDU2NzYwM30.3vfRMdjrEucRLweVSAZYhN4sdah1UsG8C-3kkwFWOu0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/company/deleteCompany/668dbecba5aefa8ebc181702",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"deleteCompany",
+								"668dbecba5aefa8ebc181702"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "searchCompanyByName",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1Njc2NTcsImV4cCI6MTcyMDU3MTI1N30.8Khm4aL-gnm5xhseNhc4sdJX-CCFJ_DXHqZ0R518IcI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/company/searchCompany/company 55",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"searchCompany",
+								"company 55"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "company 55",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCompany",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1Njc2NTcsImV4cCI6MTcyMDU3MTI1N30.8Khm4aL-gnm5xhseNhc4sdJX-CCFJ_DXHqZ0R518IcI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/company/getCompany/668d282e561667ff1558e3d9",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"getCompany",
+								"668d282e561667ff1558e3d9"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getApplication",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA1Njg0MTYsImV4cCI6MTcyMDU3MjAxNn0.2JiP0eas84u_Xez5yQuMDZzsuZuf0lE77Il_w3vHj7I",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/company/getApplication/668c75433a3b0af0d1b5a4b1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"getApplication",
+								"668c75433a3b0af0d1b5a4b1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCompany",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkOWI2ODYwZGUwMDMxMTkxMDA3YTYiLCJpYXQiOjE3MjA1NjQwMDMsImV4cCI6MTcyMDU2NzYwM30.3vfRMdjrEucRLweVSAZYhN4sdah1UsG8C-3kkwFWOu0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"numberOfEmployees\":\"200-300\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/company/updateCompany/668dbecba5aefa8ebc181702",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"company",
+								"updateCompany",
+								"668dbecba5aefa8ebc181702"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Job",
+			"item": [
+				{
+					"name": "addJob",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA0NzMxMDQsImV4cCI6MTcyMDQ3NjcwNH0.K3N_xSoo2OC-PIbyGoC2Ll8dA55aRdQ0MOoQXnmBPPk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"jobTitle\":\"flutter\",\r\n    \"jobLocation\":\"remotely\",\r\n    \"workingTime\":\"part-time\",\r\n    \"seniorityLevel\":\"Junior\",\r\n    \"jobDescription\":\"flutter\",\r\n    \"technicalSkills\":[\"dart\"],\r\n    \"softSkills\":[\"presentation skill\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/job/addJob",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"addJob"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateJob",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA1NDg1MTAsImV4cCI6MTcyMDU1MjExMH0.2jgeaGYyzgs2HYq0cTYERuBNEoma_bHq7SmyPkzSn3U",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"technicalSkillsToRemove\":[\"java\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/job/updateJob/668d820f9a4c1c9863bfaebc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"updateJob",
+								"668d820f9a4c1c9863bfaebc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteJob",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA1MjU2MzUsImV4cCI6MTcyMDUyOTIzNX0.bbkzrfkdCQyLgCRbihf2m6CranlEexUUtHoiR5e01fI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/job/deleteJob/668c750f3a3b0af0d1b5a4ad",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"deleteJob",
+								"668c750f3a3b0af0d1b5a4ad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filterJob",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA0ODA4ODksImV4cCI6MTcyMDQ4NDQ4OX0.EkuuNWw19FSnrgWCZ1U3CBS5bOPg0Jl_cpw2F6npthQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/job/filterJob?workingTime=part-time&jobTitle=javaa",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"filterJob"
+							],
+							"query": [
+								{
+									"key": "workingTime",
+									"value": "part-time"
+								},
+								{
+									"key": "jobTitle",
+									"value": "javaa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "applyJob",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhkNmQ0Y2IxOGNlZWQwYzQ1ZDAxNjQiLCJpYXQiOjE3MjA1NDQ2MjMsImV4cCI6MTcyMDU0ODIyM30.XEf-WytjoiK0FPRuw4BCR-3nydLnNCpDbVFsRcl6HoE",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"jobId\":\"668c75433a3b0af0d1b5a4b1\",\r\n    \"userTechSkills\":[\"cc\"],\r\n    \"userSoftSkills\":[\"powerPoint\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/job/applyJob",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"applyJob"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllJobsAndCompanyInfo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA1MjU2MzUsImV4cCI6MTcyMDUyOTIzNX0.bbkzrfkdCQyLgCRbihf2m6CranlEexUUtHoiR5e01fI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/job/getAllJobsAndCompanyInfo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"getAllJobsAndCompanyInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllJobsAndCompanyInfoSpecificCompanyName",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "jobapp eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhiMDA0YTc4OGVjYmUyMjgwM2VlNDgiLCJpYXQiOjE3MjA1MjU2MzUsImV4cCI6MTcyMDUyOTIzNX0.bbkzrfkdCQyLgCRbihf2m6CranlEexUUtHoiR5e01fI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/job/getAllJobsAndCompanyInfoSpecificCompanyName?companyName=company 20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"job",
+								"getAllJobsAndCompanyInfoSpecificCompanyName"
+							],
+							"query": [
+								{
+									"key": "companyName",
+									"value": "company 20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
